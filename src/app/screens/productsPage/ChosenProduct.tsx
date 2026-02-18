@@ -24,6 +24,7 @@ import { Member } from "../../../lib/types/member";
 import { serverApi } from "../../../lib/config";
 import { CartItem } from "../../../lib/types/search";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
+import { useAddToCartAnimation } from "../../context/AddToCartAnimation";
 import { Typography } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
@@ -56,6 +57,7 @@ export default function ChosenProduct(props: ChosenProductProps) {
   const { restaurant } = useSelector(restaurantRetriever);
   const { chosenProduct } = useSelector(chosenProductRetriever);
   const device = useDeviceDetect();
+  const addToCartAnim = useAddToCartAnimation();
   useEffect(() => {
     const product = new ProductService();
     product
@@ -152,13 +154,15 @@ export default function ChosenProduct(props: ChosenProductProps) {
               className="mobile-add-to-basket-btn"
               startIcon={<AddShoppingCartIcon />}
               onClick={(e) => {
-                onAdd({
+                const item = {
                   _id: chosenProduct._id,
                   quantity: 1,
                   name: chosenProduct.productName,
                   price: chosenProduct.productPrice,
                   image: chosenProduct.productImages[0],
-                });
+                };
+                addToCartAnim?.triggerAnimation(e.currentTarget, item.image);
+                onAdd(item);
                 e.stopPropagation();
               }}
             >

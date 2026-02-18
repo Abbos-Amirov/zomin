@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Route, Switch, useLocation, useHistory } from "react-router-dom";
-import HomePage from "./screens/homePage";
+import { Route, Switch, useLocation, useHistory, Redirect } from "react-router-dom";
 import ProductsPage from "./screens/productsPage";
 import OrdersPage from "./screens/ordersPage";
 import UserPage from "./screens/userPage";
-import HomeNavbar from "./components/headers/HomeNavbar";
 import OtherNavbar from "./components/headers/OtherNavbar";
 import Footer from "./components/footer";
 import HelpPage from "./screens/helpPage";
@@ -17,9 +15,11 @@ import { useGlobals } from "./hooks/useGlobals";
 import "../css/app.css";
 import "../css/navbar.css";
 import "../css/footer.css";
+import "../css/add-to-cart-animation.css";
 import QrLanding from "./components/qrLanding";
 import TableService from "./services/TableService";
 import CallButton from "./components/callWaiter";
+import { AddToCartAnimationProvider } from "./context/AddToCartAnimation";
 
 export default function App() {
   const location = useLocation();
@@ -33,7 +33,7 @@ export default function App() {
   // Route protection: authTable can only access /products and /orders
   useEffect(() => {
     if (authTable) {
-      const restrictedRoutes = ["/", "/member-page", "/help"];
+      const restrictedRoutes = ["/", "/member-page"];
       if (restrictedRoutes.includes(location.pathname)) {
         history.push("/products");
       }
@@ -88,9 +88,8 @@ export default function App() {
   };
 
   return (
-    <>
-      {location.pathname === "/" ? (
-        <HomeNavbar
+    <AddToCartAnimationProvider>
+      <OtherNavbar
           cartItems={cartItems}
           onAdd={onAdd}
           onRemove={onRemove}
@@ -102,22 +101,7 @@ export default function App() {
           handleLogoutOpen={handleLogoutOpen}
           handleCloseLogout={handleCloseLogout}
           handleLogoutClick={handleLogoutClick}
-        />
-      ) : (
-        <OtherNavbar
-          cartItems={cartItems}
-          onAdd={onAdd}
-          onRemove={onRemove}
-          onDelete={onDelete}
-          onDeleteAll={onDeleteAll}
-          setSignupOpen={setSignupOpen}
-          setLoginOpen={setLoginOpen}
-          anchorEl={anchorEl}
-          handleLogoutOpen={handleLogoutOpen}
-          handleCloseLogout={handleCloseLogout}
-          handleLogoutClick={handleLogoutClick}
-        />
-      )}
+      />
       <Switch>
         <Route path="/products">
           <ProductsPage onAdd={onAdd} />
@@ -134,8 +118,8 @@ export default function App() {
         <Route path={"/table/qr/:id"}>
           <QrLanding />
         </Route>
-        <Route path="/">
-          <HomePage />
+        <Route exact path="/">
+          <Redirect to="/products" />
         </Route>
       </Switch>
       <Footer />
@@ -147,6 +131,6 @@ export default function App() {
         handleLoginClose={handleLoginClose}
         handleSignupClose={handleSignupClose}
       />
-    </>
+    </AddToCartAnimationProvider>
   );
 }

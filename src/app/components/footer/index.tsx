@@ -1,9 +1,12 @@
 import React from "react";
 import { Box, Container, Stack } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import styled from "styled-components";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { useGlobals } from "../../hooks/useGlobals";
+import { RESTAURANT_NAME } from "../../../lib/config";
+import { useLanguage } from "../../context/LanguageContext";
+import "../../../css/mobile/footer.css";
 
 const Footers = styled.div`
   width: 100%;
@@ -16,24 +19,86 @@ const Footers = styled.div`
 export default function Footer() {
   const { authMember, authTable } = useGlobals();
   const device = useDeviceDetect();
+  const { t } = useLanguage();
 
-  if(device === "mobile") {
-    if(authTable) {
-      return null;
-    } else {
-      return <div>Mobile Footer</div>;
-    }
-  } else {
+  if (device === "mobile") {
+    return (
+      <footer className="mobile-footer">
+        <div className="mobile-footer-content">
+          <Box className="mobile-footer-brand">
+            <img
+              className="mobile-footer-logo"
+              src="/icons/zomin.svg"
+              alt={RESTAURANT_NAME}
+            />
+            <span className="mobile-footer-restaurant-name">{RESTAURANT_NAME}</span>
+            <p className="mobile-footer-tagline">
+              {t("authenticFlavors")}
+            </p>
+          </Box>
+
+          <Box className="mobile-footer-links">
+            <NavLink to="/products">{t("menu")}</NavLink>
+            {(authTable || authMember) && <NavLink to="/orders">{t("orders")}</NavLink>}
+            <NavLink to="/help">{t("help")}</NavLink>
+          </Box>
+
+          <div className="mobile-footer-divider" />
+
+          <Box className="mobile-footer-contact">
+            <div className="mobile-footer-contact-item">
+              <span>L.</span>
+              <span>Amir Temur Street, Tashkent</span>
+            </div>
+            <div className="mobile-footer-contact-item">
+              <span>P.</span>
+              <span>+998 90 123 45 67</span>
+            </div>
+            <div className="mobile-footer-contact-item">
+              <span>E.</span>
+              <span>zomin.restaurant@gmail.com</span>
+            </div>
+            <div className="mobile-footer-contact-item">
+              <span>H.</span>
+              <span>{t("open247")}</span>
+            </div>
+          </Box>
+
+          <Box className="mobile-footer-social">
+            <a href="#" aria-label="Facebook">
+              <img src="/icons/facebook.svg" alt="" />
+            </a>
+            <a href="#" aria-label="Twitter">
+              <img src="/icons/twitter.svg" alt="" />
+            </a>
+            <a href="#" aria-label="Instagram">
+              <img src="/icons/instagram.svg" alt="" />
+            </a>
+            <a href="#" aria-label="YouTube">
+              <img src="/icons/youtube.svg" alt="" />
+            </a>
+          </Box>
+
+          <div className="mobile-footer-divider" />
+
+          <span className="mobile-footer-copyright">
+            © {new Date().getFullYear()} {RESTAURANT_NAME}. {t("allRightsReserved")}.
+          </span>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <Footers>
       <Container>
         <Stack flexDirection={"row"} sx={{ mt: "94px" }}>
           <Stack flexDirection={"column"} style={{ width: "340px" }}>
             <Box>
-              <img width={"100px"} src={"/icons/navruz.svg"} />
+              <img width={"100px"} src={"/icons/zomin.svg"} />
             </Box>
             <Box className={"foot-desc-txt"}>
-              Celebrating the spirit of Uzbekistan, Navruz Restaurant brings
+              Celebrating the spirit of Uzbekistan, Zomin Restaurant brings
               authentic flavors of plov, kebabs, and traditional dishes to your
               table. A place where culture meets taste.
             </Box>
@@ -49,17 +114,17 @@ export default function Footer() {
               <Box>
                 <Box className={"foot-category-title"}>Sections</Box>
                 <Box className={"foot-category-link"}>
-                  <Link to="/">Home</Link>
-                  <Link to="/products">Menu</Link>
-                  {authMember && <Link to="/orders">Orders</Link>}
-                  <Link to="/help">Help</Link>
-                  <Link to="/about">About</Link>
+                  <Link to="/">{t("home")}</Link>
+                  <Link to="/products">{t("menu")}</Link>
+                  {authMember && <Link to="/orders">{t("orders")}</Link>}
+                  <Link to="/help">{t("help")}</Link>
+                  <Link to="/about">{t("about")}</Link>
                 </Box>
               </Box>
             </Stack>
             <Stack sx={{ ml: "100px" }}>
               <Box>
-                <Box className={"foot-category-title"}>Find us</Box>
+                <Box className={"foot-category-title"}>{t("findUs")}</Box>
                 <Box
                   flexDirection={"column"}
                   sx={{ mt: "20px" }}
@@ -76,11 +141,11 @@ export default function Footer() {
                   </Box>
                   <Box className={"find-us"}>
                     <span>E.</span>
-                    <div>navruz.restaurant@gmail.com</div>
+                    <div>zomin.restaurant@gmail.com</div>
                   </Box>
                   <Box className={"find-us"}>
                     <span>H.</span>
-                    <div>Open 24/7</div>
+                    <div>{t("open247")}</div>
                   </Box>
                 </Box>
               </Box>
@@ -92,10 +157,9 @@ export default function Footer() {
           sx={{ mt: "80px" }}
         ></Stack>
         <Stack className={"copyright-txt"}>
-          © {new Date().getFullYear()} Navruz Restaurant, All rights reserved.
+          © {new Date().getFullYear()} Zomin Restaurant. {t("allRightsReserved")}.
         </Stack>
       </Container>
     </Footers>
     );
-  }
 }

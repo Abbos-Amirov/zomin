@@ -1,5 +1,7 @@
 export const serverApi: string = `${process.env.REACT_APP_API_URL}`;
 
+export const RESTAURANT_NAME = "Zomin";
+
 export const Messages = {
   error1: "Somthing went wrong!",
   error2: "Please login first!",

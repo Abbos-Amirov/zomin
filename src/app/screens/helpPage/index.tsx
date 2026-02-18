@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import React from "react";
 import { Box, Container, Stack, Tabs } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Tab from "@mui/material/Tab";
@@ -11,30 +10,52 @@ import Button from "@mui/material/Button";
 import TabContext from "@mui/lab/TabContext";
 import TabPanel from "@mui/lab/TabPanel";
 import { useGlobals } from "../../hooks/useGlobals";
+import { useLanguage } from "../../context/LanguageContext";
 import "../../../css/help.css";
+import "../../../css/mobile/help.css";
 import { faq } from "../../../lib/data/faq";
 import { terms } from "../../../lib/data/terms";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
+
 export default function HelpPage() {
-  const history = useHistory();
   const { authTable } = useGlobals();
   const device = useDeviceDetect();
-  const [value, setValue] = React.useState("1");
-
-  // Redirect authTable to products page (authTable cannot access help page)
-  useEffect(() => {
-    if (authTable) {
-      history.push("/products");
-    }
-  }, [authTable, history]);
+  const { t } = useLanguage();
+  const [value, setValue] = React.useState("0");
 
   /** HANDLERS **/
   const handleChange = (e: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
-  if(device === "mobile") {
-    return <div>Mobile Help Page</div>;
+  if (device === "mobile") {
+    return (
+      <div className="mobile-help-page">
+        <Typography className="mobile-help-title">{t("helpTitle")}</Typography>
+        <Box className="mobile-help-cards">
+          <Box className="mobile-help-card">
+            <Typography className="mobile-help-card-title">{t("helpLangTitle")}</Typography>
+            <Typography className="mobile-help-card-desc">{t("helpLangDesc")}</Typography>
+          </Box>
+          <Box className="mobile-help-card">
+            <Typography className="mobile-help-card-title">{t("helpAddCartTitle")}</Typography>
+            <Typography className="mobile-help-card-desc">{t("helpAddCartDesc")}</Typography>
+          </Box>
+          <Box className="mobile-help-card">
+            <Typography className="mobile-help-card-title">{t("helpCartTitle")}</Typography>
+            <Typography className="mobile-help-card-desc">{t("helpCartDesc")}</Typography>
+          </Box>
+          <Box className="mobile-help-card">
+            <Typography className="mobile-help-card-title">{t("helpOrderTitle")}</Typography>
+            <Typography className="mobile-help-card-desc">{t("helpOrderDesc")}</Typography>
+          </Box>
+          <Box className="mobile-help-card">
+            <Typography className="mobile-help-card-title">{t("helpSearchTitle")}</Typography>
+            <Typography className="mobile-help-card-desc">{t("helpSearchDesc")}</Typography>
+          </Box>
+        </Box>
+      </div>
+    );
   } else {
   return (
     <div className={"help-page"}>
@@ -48,6 +69,7 @@ export default function HelpPage() {
                 aria-label="lab API tabs example"
                 className={"table_list"}
               >
+                <Tab label={t("helpHowTo").toUpperCase()} value={"0"} />
                 <Tab label="TERMS" value={"1"} />
                 <Tab label="FAQ" value={"2"} />
                 <Tab label="CONTACT" value={"3"} />
@@ -56,6 +78,17 @@ export default function HelpPage() {
           </Box>
           <Stack>
             <Stack className={"help-main-content"}>
+              <TabPanel value={"0"}>
+                <Stack className={"rules-box"}>
+                  <Box className={"rules-frame"}>
+                    <p><strong>{t("helpLangTitle")}</strong>: {t("helpLangDesc")}</p>
+                    <p><strong>{t("helpAddCartTitle")}</strong>: {t("helpAddCartDesc")}</p>
+                    <p><strong>{t("helpCartTitle")}</strong>: {t("helpCartDesc")}</p>
+                    <p><strong>{t("helpOrderTitle")}</strong>: {t("helpOrderDesc")}</p>
+                    <p><strong>{t("helpSearchTitle")}</strong>: {t("helpSearchDesc")}</p>
+                  </Box>
+                </Stack>
+              </TabPanel>
               <TabPanel value={"1"}>
                 <Stack className={"rules-box"}>
                   <Box className={"rules-frame"}>

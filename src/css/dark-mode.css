@@ -1,0 +1,268 @@
+/* Dark Mode - Oq/Qora inversiya */
+
+.dark-mode body {
+  background: #1a1a1a;
+}
+
+.dark-mode #root {
+  background: #1a1a1a;
+}
+
+/* Navbar */
+.dark-mode .other-navbar.mobile-navbar {
+  background: #1a1a1a;
+}
+
+.dark-mode .other-navbar.mobile-navbar .hover-line a,
+.dark-mode .mobile-navbar-restaurant-name {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .language-globe-icon,
+.dark-mode .dark-mode-icon {
+  filter: brightness(0) invert(1) !important;
+}
+
+.dark-mode .other-navbar.mobile-navbar .hover-line a:hover {
+  color: #ffffff !important;
+}
+
+.dark-mode .other-navbar.mobile-navbar .underline {
+  border-bottom-color: #d7b686 !important;
+}
+
+/* Dark mode toggle icon - light mode icon in dark mode */
+.dark-mode .dark-mode-icon {
+  color: #f0f0f0 !important;
+}
+
+/* Products page */
+.dark-mode .mobile-products-page {
+  background: #1a1a1a;
+}
+
+.dark-mode .mobile-products-search,
+.dark-mode .mobile-category-section,
+.dark-mode .mobile-sort-section {
+  background: #2d2d2d !important;
+}
+
+.dark-mode .mobile-search-container {
+  background: #3d3d3d !important;
+}
+
+.dark-mode .mobile-search-input {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-search-input::placeholder {
+  color: #aaa !important;
+}
+
+.dark-mode .mobile-category-chip,
+.dark-mode .mobile-sort-chip {
+  background: #3d3d3d !important;
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-category-chip.active,
+.dark-mode .mobile-sort-chip.active {
+  background: #3776CC !important;
+  color: #fff !important;
+}
+
+.dark-mode .mobile-product-card {
+  background: #2d2d2d !important;
+}
+
+.dark-mode .mobile-product-name {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-product-price span,
+.dark-mode .mobile-price-icon {
+  color: #ff6b6b !important;
+}
+
+.dark-mode .mobile-product-info {
+  background: transparent;
+}
+
+.dark-mode .mobile-no-products .MuiTypography-root {
+  color: #aaa !important;
+}
+
+.dark-mode .mobile-pagination {
+  background: #2d2d2d !important;
+}
+
+/* Help page */
+.dark-mode .mobile-help-page {
+  background: #1a1a1a;
+}
+
+.dark-mode .mobile-help-title {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-help-card {
+  background: #2d2d2d !important;
+}
+
+.dark-mode .mobile-help-card-title {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-help-card-desc {
+  color: #ccc !important;
+}
+
+/* Footer */
+.dark-mode .mobile-footer {
+  background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+}
+
+.dark-mode .mobile-footer-restaurant-name {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-footer-tagline {
+  color: #aaa !important;
+}
+
+.dark-mode .mobile-footer-links a {
+  color: #e3c08d !important;
+}
+
+.dark-mode .mobile-footer-contact-item {
+  color: #e3c08d !important;
+}
+
+.dark-mode .mobile-footer-contact-item span {
+  color: #d7b686 !important;
+}
+
+.dark-mode .mobile-footer-copyright {
+  color: #888 !important;
+}
+
+/* Basket drawer */
+.dark-mode .mobile-basket-frame {
+  background: #1a1a1a !important;
+}
+
+.dark-mode .mobile-basket-header {
+  background: #2d2d2d !important;
+}
+
+.dark-mode .mobile-basket-title {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-basket-items-wrapper {
+  background: #1a1a1a !important;
+}
+
+.dark-mode .mobile-basket-item {
+  background: #2d2d2d !important;
+}
+
+.dark-mode .mobile-basket-item .mobile-product-name {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-product-price {
+  color: #ff6b6b !important;
+}
+
+.dark-mode .mobile-basket-footer {
+  background: #2d2d2d !important;
+}
+
+.dark-mode .mobile-basket-total {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-basket-empty span {
+  color: #888 !important;
+}
+
+/* Chosen product detail */
+.dark-mode .mobile-chosen-product {
+  background: #1a1a1a;
+}
+
+.dark-mode .mobile-product-detail-info {
+  background: #2d2d2d !important;
+}
+
+.dark-mode .mobile-product-detail-name {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-product-detail-restaurant {
+  color: #aaa !important;
+}
+
+.dark-mode .mobile-description-title {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-description-text {
+  color: #ccc !important;
+}
+
+.dark-mode .mobile-price-amount {
+  color: #fff !important;
+}
+
+/* Dark mode toggle button */
+.dark-mode-toggle-btn {
+  padding: 6px !important;
+}
+
+.dark-mode-toggle-btn .dark-mode-icon {
+  color: #f8f8ff !important;
+  font-size: 22px !important;
+}
+
+.dark-mode .dark-mode-toggle-btn .dark-mode-icon {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Orders page */
+.dark-mode .mobile-orders-page {
+  background: #1a1a1a;
+}
+
+.dark-mode .mobile-order-tab-chip {
+  background: #2d2d2d !important;
+  color: #ccc !important;
+  border-color: #444 !important;
+}
+
+.dark-mode .mobile-order-tab-chip.active {
+  background: #3776CC !important;
+  color: #fff !important;
+}
+
+.dark-mode .mobile-order-card {
+  background: #2d2d2d !important;
+}
+
+.dark-mode .mobile-order-card .MuiTypography-root {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-order-card .MuiChip-root {
+  background: #3d3d3d !important;
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-no-orders .MuiTypography-root {
+  color: #888 !important;
+}

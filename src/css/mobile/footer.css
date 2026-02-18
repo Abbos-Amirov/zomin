@@ -1,0 +1,159 @@
+/* Mobile Footer - Clean & Compact */
+
+.mobile-footer {
+  width: 100%;
+  background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+  padding: 24px 16px 20px;
+  margin-top: 32px;
+}
+
+.mobile-footer-content {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Logo & Brand */
+.mobile-footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-footer-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.mobile-footer-restaurant-name {
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #f8f8ff;
+  letter-spacing: 0.5px;
+}
+
+.mobile-footer-tagline {
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  color: #b8b8b8;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+/* Quick Links */
+.mobile-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 20px;
+}
+
+.mobile-footer-links a {
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #e3c08d;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.mobile-footer-links a:hover {
+  color: #f8f8ff;
+}
+
+/* Divider */
+.mobile-footer-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(215, 182, 134, 0.3);
+  margin: 4px 0;
+}
+
+/* Contact Info */
+.mobile-footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.mobile-footer-contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  color: #e3c08d;
+}
+
+.mobile-footer-contact-item span {
+  font-weight: 700;
+  color: #d7b686;
+  min-width: 20px;
+}
+
+/* Social Icons */
+.mobile-footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.mobile-footer-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.mobile-footer-social a:active {
+  transform: scale(0.95);
+}
+
+.mobile-footer-social img {
+  width: 28px;
+  height: 28px;
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
+}
+
+/* Copyright */
+.mobile-footer-copyright {
+  font-family: "Poppins", sans-serif;
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+  padding-top: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 360px) {
+  .mobile-footer {
+    padding: 20px 12px 16px;
+  }
+
+  .mobile-footer-restaurant-name {
+    font-size: 16px;
+  }
+
+  .mobile-footer-tagline {
+    font-size: 11px;
+  }
+
+  .mobile-footer-contact-item {
+    font-size: 12px;
+  }
+
+  .mobile-footer-social img {
+    width: 24px;
+    height: 24px;
+  }
+}

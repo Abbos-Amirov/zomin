@@ -14,6 +14,10 @@ import { useGlobals } from "../../hooks/useGlobals";
 import { serverApi } from "../../../lib/config";
 import { Logout } from "@mui/icons-material";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
+import { RESTAURANT_NAME } from "../../../lib/config";
+import { useLanguage } from "../../context/LanguageContext";
+import LanguageSwitcher from "./LanguageSwitcher";
+import DarkModeToggle from "./DarkModeToggle";
 import "../../../css/mobile/navbar.css";
 
 interface OtherNavbarProps {
@@ -48,49 +52,53 @@ export default function OtherNavbar(props: OtherNavbarProps) {
   } = props;
   const { authMember, authTable } = useGlobals();
   const device = useDeviceDetect();
+  const { t } = useLanguage();
 
   if (device === "mobile") {
-    if (authTable) {
-      return (
-        <div className="other-navbar mobile-navbar">
-          <Container className="navbar-container">
-            <Stack className="menu">
-              <Box>
-                <img
-                  className="brand-logo"
-                  src="/icons/navruz.svg"
-                  alt="Navruz Logo"
-                />
+    return (
+      <div className="other-navbar mobile-navbar">
+        <Container className="navbar-container">
+          <Stack className="menu">
+            <Box className="mobile-navbar-left">
+              <img
+                className="brand-logo mobile-navbar-logo"
+                src="/icons/zomin.svg"
+                alt={RESTAURANT_NAME}
+              />
+            </Box>
+
+            <Stack className="links mobile-navbar-right">
+              <Box className={"hover-line"}>
+                <NavLink to="/products" activeClassName="underline">
+                  {t("menu")}
+                </NavLink>
               </Box>
-
-              <Stack className="links">
-                <Box className={"hover-line"}>
-                  <NavLink to="/products" activeClassName="underline">
-                    Menu
-                  </NavLink>
-                </Box>
-
+              <Box className={"hover-line"}>
+                <NavLink to="/help" activeClassName="underline">
+                  {t("help")}
+                </NavLink>
+              </Box>
+              {authTable && (
                 <Box className={"hover-line"}>
                   <NavLink to="/orders" activeClassName="underline">
-                    Orders
+                    {t("orders")}
                   </NavLink>
                 </Box>
-
-                <Basket
-                  cartItems={cartItems}
-                  onAdd={onAdd}
-                  onRemove={onRemove}
-                  onDelete={onDelete}
-                  onDeleteAll={onDeleteAll}
-                />
-              </Stack>
+              )}
+              <Basket
+                cartItems={cartItems}
+                onAdd={onAdd}
+                onRemove={onRemove}
+                onDelete={onDelete}
+                onDeleteAll={onDeleteAll}
+              />
+              <LanguageSwitcher />
+              <DarkModeToggle />
             </Stack>
-          </Container>
-        </div>
-      );
-    } else {
-      return <div>Mobile Other Navbar</div>;
-    }
+          </Stack>
+        </Container>
+      </div>
+    );
   } else {
     return (
       <div className="other-navbar">
@@ -98,41 +106,39 @@ export default function OtherNavbar(props: OtherNavbarProps) {
           <Stack className="menu">
             <Box>
               <NavLink to="/">
-                <img className="brand-logo" src="/icons/navruz.svg"></img>
+                <img className="brand-logo" src="/icons/zomin.svg"></img>
               </NavLink>
             </Box>
             <Stack className="links">
               {!authTable && (
                 <Box className={"hover-line"}>
-                  <NavLink to="/">Home</NavLink>
+                  <NavLink to="/">{t("home")}</NavLink>
                 </Box>
               )}
               <Box className={"hover-line"}>
                 <NavLink to="/products" activeClassName="underline">
-                  Products
+                  {t("products")}
                 </NavLink>
               </Box>
               {authMember || authTable ? (
                 <Box className={"hover-line"}>
                   <NavLink to="/orders" activeClassName="underline">
-                    Orders
+                    {t("orders")}
                   </NavLink>
                 </Box>
               ) : null}
               {authMember ? (
                 <Box className={"hover-line"}>
                   <NavLink to="/member-page" activeClassName="underline">
-                    My page
+                    {t("myPage")}
                   </NavLink>
                 </Box>
               ) : null}
-              {!authTable && (
-                <Box className="hover-line">
-                  <NavLink to="/help" activeClassName="underline">
-                    Help
-                  </NavLink>
-                </Box>
-              )}
+              <Box className="hover-line">
+                <NavLink to="/help" activeClassName="underline">
+                  {t("help")}
+                </NavLink>
+              </Box>
 
               <Basket
                 cartItems={cartItems}
@@ -141,6 +147,8 @@ export default function OtherNavbar(props: OtherNavbarProps) {
                 onDelete={onDelete}
                 onDeleteAll={onDeleteAll}
               />
+              <LanguageSwitcher />
+              <DarkModeToggle />
 
               {!authMember && !authTable ? (
                 <Box>
@@ -149,7 +157,7 @@ export default function OtherNavbar(props: OtherNavbarProps) {
                     className="login-button"
                     onClick={() => setLoginOpen(true)}
                   >
-                    Login
+                    {t("login")}
                   </Button>
                 </Box>
               ) : (
@@ -204,7 +212,7 @@ export default function OtherNavbar(props: OtherNavbarProps) {
                   <ListItemIcon>
                     <Logout fontSize="small" style={{ color: "blue" }} />
                   </ListItemIcon>
-                  Logout
+                  {t("logout")}
                 </MenuItem>
               </Menu>
             </Stack>

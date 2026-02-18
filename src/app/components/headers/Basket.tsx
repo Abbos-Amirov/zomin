@@ -14,6 +14,7 @@ import { sweetErrorHandling } from "../../../lib/sweetAlert";
 import { useGlobals } from "../../hooks/useGlobals";
 import OrderService from "../../services/OrderService";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
+import { useLanguage } from "../../context/LanguageContext";
 import "../../../css/mobile/navbar.css";
 
 interface BasketProps {
@@ -35,8 +36,21 @@ export default function Basket(props: BasketProps) {
   const shippingCost: number = itemsPrice < 100 ? 5 : 0;
   const totalPrice = (itemsPrice + shippingCost).toFixed(1);
   const device = useDeviceDetect();
+  const { t } = useLanguage();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [bounce, setBounce] = React.useState(false);
   const open = Boolean(anchorEl);
+  const prevCountRef = React.useRef(cartItems.length);
+
+  React.useEffect(() => {
+    if (cartItems.length > prevCountRef.current) {
+      setBounce(true);
+      const t = setTimeout(() => setBounce(false), 500);
+      prevCountRef.current = cartItems.length;
+      return () => clearTimeout(t);
+    }
+    prevCountRef.current = cartItems.length;
+  }, [cartItems.length]);
 
   /** HANDLERS **/
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -68,9 +82,11 @@ export default function Basket(props: BasketProps) {
     return (
       <Box className={"hover-line mobile-basket"}>
         <IconButton
+          id="cart-icon"
           aria-label="cart"
           onClick={handleClick}
           sx={{ color: "#f8f8ff" }}
+          className={bounce ? "cart-badge-bounce" : ""}
         >
           <Badge badgeContent={cartItems.length} color="secondary">
             <img src={"/icons/shopping-cart.svg"} alt="Cart" />
@@ -94,10 +110,10 @@ export default function Basket(props: BasketProps) {
             <Box className={"mobile-basket-header"}>
               <Box className={"mobile-basket-title"}>
                 {cartItems.length === 0 ? (
-                  <span>Cart is empty!</span>
+                  <span>{t("cartEmpty")}</span>
                 ) : (
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <span>Cart Products ({cartItems.length})</span>
+                    <span>{t("cartProducts")} ({cartItems.length})</span>
                     {cartItems.length > 0 && (
                       <DeleteForeverIcon
                         sx={{ cursor: "pointer", fontSize: "20px" }}
@@ -180,7 +196,7 @@ export default function Basket(props: BasketProps) {
                   onClick={proceedOrderHandler}
                   className="mobile-order-button"
                 >
-                  Order
+                  {t("order")}
                 </Button>
               </Box>
             )}
@@ -192,8 +208,8 @@ export default function Basket(props: BasketProps) {
   return (
     <Box className={"hover-line"}>
       <IconButton
+        id="cart-icon"
         aria-label="cart"
-        id="basic-button"
         aria-controls={open ? "basic-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
@@ -241,10 +257,10 @@ export default function Basket(props: BasketProps) {
         <Stack className={"basket-frame"}>
           <Box className={"all-check-box"}>
             {cartItems.length === 0 ? (
-              <div>Cart is empty!</div>
+              <div>{t("cartEmpty")}</div>
             ) : (
               <Stack flexDirection={"row"}>
-                <div>Cart Products:</div>
+                <div>{t("cartProducts")}:</div>
                 <DeleteForeverIcon
                   sx={{ marginLeft: "5px", cursor: "pointer" }}
                   onClick={onDeleteAll}
@@ -299,7 +315,7 @@ export default function Basket(props: BasketProps) {
                 variant={"contained"}
                 onClick={proceedOrderHandler}
               >
-                Order
+                {t("order")}
               </Button>
             </Box>
           ) : (

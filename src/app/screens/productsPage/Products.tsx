@@ -32,7 +32,17 @@ import { serverApi } from "../../../lib/config";
 import { useHistory } from "react-router-dom";
 import { CartItem } from "../../../lib/types/search";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
+import { useLanguage } from "../../context/LanguageContext";
+import { useAddToCartAnimation } from "../../context/AddToCartAnimation";
 import "../../../css/mobile/products.css";
+
+const categoryKeys: Record<string, string> = {
+  DISH: "dish",
+  DESSERT: "dessert",
+  DRINK: "drink",
+  OTHER: "other",
+  SALAD: "salad",
+};
 
 /** REDUX SLICE & SELECTOR */
 const actionDispatch = (dispatch: Dispatch) => ({
@@ -84,6 +94,8 @@ export default function Products(props: ProductProps) {
   const [searchText, setSearchText] = useState<string>("");
   const history = useHistory();
   const device = useDeviceDetect();
+  const { t } = useLanguage();
+  const addToCartAnim = useAddToCartAnimation();
 
   useEffect(() => {
     const product = new ProductService();
@@ -136,7 +148,7 @@ export default function Products(props: ProductProps) {
           <Box className="mobile-search-container">
             <input
               type="search"
-              placeholder="Search dishes..."
+              placeholder={t("searchDishes")}
               className="mobile-search-input"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -160,12 +172,12 @@ export default function Products(props: ProductProps) {
               ProductCollection.DISH,
               ProductCollection.DESSERT,
               ProductCollection.DRINK,
-              ProductCollection.OTHER,
               ProductCollection.SALAD,
+              ProductCollection.OTHER,
             ].map((item, i) => (
               <Chip
                 key={i}
-                label={item}
+                label={t(categoryKeys[item] || item)}
                 onClick={() => searchCollectionHandler(item)}
                 className={`mobile-category-chip ${
                   productSearch.productCollection === item ? "active" : ""
@@ -178,7 +190,7 @@ export default function Products(props: ProductProps) {
         {/* Sort Options */}
         <Box className="mobile-sort-section">
           <Chip
-            label="New"
+            label={t("new")}
             onClick={() => searchOrderHandler("createdAt")}
             className={`mobile-sort-chip ${
               productSearch.order === "createdAt" ? "active" : ""
@@ -186,7 +198,7 @@ export default function Products(props: ProductProps) {
             size="small"
           />
           <Chip
-            label="Price"
+            label={t("price")}
             onClick={() => searchOrderHandler("productPrice")}
             className={`mobile-sort-chip ${
               productSearch.order === "productPrice" ? "active" : ""
@@ -194,7 +206,7 @@ export default function Products(props: ProductProps) {
             size="small"
           />
           <Chip
-            label="Popular"
+            label={t("popular")}
             onClick={() => searchOrderHandler("productViews")}
             className={`mobile-sort-chip ${
               productSearch.order === "productViews" ? "active" : ""
@@ -233,13 +245,17 @@ export default function Products(props: ProductProps) {
                       <IconButton
                         className="mobile-product-cart-btn"
                         onClick={(e) => {
-                          onAdd({
+                          const item = {
                             _id: product._id,
                             quantity: 1,
                             name: product.productName,
                             price: product.productPrice,
                             image: product.productImages[0],
-                          });
+                          };
+                          const card = (e.currentTarget as HTMLElement).closest(".mobile-product-card");
+                          const imgEl = card?.querySelector(".mobile-product-image") as HTMLElement;
+                          addToCartAnim?.triggerAnimation(imgEl || e.currentTarget, item.image);
+                          onAdd(item);
                           e.stopPropagation();
                         }}
                       >
@@ -270,7 +286,7 @@ export default function Products(props: ProductProps) {
             </Box>
           ) : (
             <Box className="mobile-no-products">
-              <Typography>No products available</Typography>
+              <Typography>{t("noProducts")}</Typography>
             </Box>
           )}
         </Box>
@@ -312,7 +328,7 @@ export default function Products(props: ProductProps) {
                 width={"100%"}
               >
                 <Stack className="avatar-big-box">
-                  <Box className="top-text">Burak restaurant</Box>
+                  <Box className="top-text">Zomin restaurant</Box>
                   <Stack flexDirection={"row"} alignItems={"center"}>
                     <input
                       type="search"
