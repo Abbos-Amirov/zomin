@@ -195,7 +195,7 @@ export default function Basket(props: BasketProps) {
                   onClick={proceedOrderHandler}
                   className="mobile-order-button"
                 >
-                  {t("order")}
+                  {t("orderReady")}
                 </Button>
               </Box>
             )}
@@ -314,7 +314,7 @@ export default function Basket(props: BasketProps) {
                 variant={"contained"}
                 onClick={proceedOrderHandler}
               >
-                {t("order")}
+                {t("orderReady")}
               </Button>
             </Box>
           ) : (

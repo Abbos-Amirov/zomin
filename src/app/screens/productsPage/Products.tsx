@@ -101,7 +101,7 @@ export default function Products(props: ProductProps) {
   useEffect(() => {
     const product = new ProductService();
     product
-      .getAdminProducts()
+      .getProducts(productSearch)
       .then((data) => {
         const list = Array.isArray(data) ? data : (data as any)?.data ?? (data as any)?.value ?? [];
         setProducts(Array.isArray(list) ? list : []);
@@ -110,7 +110,7 @@ export default function Products(props: ProductProps) {
         console.log("Products fetch error:", err);
         setProducts([]);
       });
-  }, []);
+  }, [productSearch]);
 
   useEffect(() => {
     if (searchText === "") {

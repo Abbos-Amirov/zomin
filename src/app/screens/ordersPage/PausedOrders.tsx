@@ -16,6 +16,7 @@ import { Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
+import { useLanguage } from "../../context/LanguageContext";
 
 /** REDUX SLICE & SELECTOR */
 
@@ -28,6 +29,7 @@ export default function PausedOrders() {
   const { setOrderBulder, authMember, authTable } = useGlobals();
   const { pausedOrders } = useSelector(pausedOrdersRetriever);
   const device = useDeviceDetect();
+  const { t } = useLanguage();
 
   /** HANDLERS **/
   const deleteOrderHandler = async (e: T) => {
@@ -78,6 +80,9 @@ export default function PausedOrders() {
   if (device === "mobile") {
     return (
       <Box>
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: "#333" }}>
+          {t("pausedOrdersTitle")}
+        </Typography>
         <Box className="mobile-orders-list">
           {pausedOrders && pausedOrders.length > 0 ? (
             pausedOrders.map((order: Order) => (
@@ -156,7 +161,7 @@ export default function PausedOrders() {
           ) : (
             <Box className="mobile-no-orders">
               <img src="/icons/noimage-list.svg" alt="No orders" />
-              <Typography>No paused orders</Typography>
+              <Typography>{t("noPausedOrders")}</Typography>
             </Box>
           )}
         </Box>
@@ -166,16 +171,22 @@ export default function PausedOrders() {
 
   return (
     <Box>
+      <Typography variant="h5" sx={{ fontWeight: 700, mb: 2, color: "#333" }}>
+        {t("pausedOrdersTitle")}
+      </Typography>
       <Stack>
         {pausedOrders?.map((order: Order) => {
           return (
             <Box key={order._id} className="order-main-box">
               <Box className="order-box-scroll">
                 {order.orderItems?.map((item: OrderItem) => {
-                  const product: Product = order.productData.filter(
+                  const product: Product | undefined = order.productData?.filter(
                     (ele: Product) => item.productId === ele._id
                   )[0];
-                  const imagePath = `${serverApi}/${product.productImages[0]}`;
+                  if (!product) return null;
+                  const imagePath = product.productImages?.[0]
+                    ? `${serverApi}/${product.productImages[0]}`
+                    : "/icons/noimage-list.svg";
                   return (
                     <Box key={item._id} className="orders-name-price">
                       <img src={imagePath} className="order-dish-img" />
@@ -208,7 +219,7 @@ export default function PausedOrders() {
                     color={"secondary"}
                     onClick={deleteOrderHandler}
                   >
-                    cancel
+                    {t("cancel")}
                   </Button>
                   <Button
                     value={order._id}
@@ -216,7 +227,7 @@ export default function PausedOrders() {
                     className="verify-button"
                     onClick={processOrderHandler}
                   >
-                    {authMember ? "payment" : "order"}
+                    {authMember ? t("payment") : t("order")}
                   </Button>
                 </Box>
               </Box>
