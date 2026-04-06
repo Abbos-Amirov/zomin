@@ -1,0 +1,75 @@
+/* Auth Required - Link users must signup/login */
+
+.auth-required-wrapper {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.auth-required {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.auth-required-content {
+  text-align: center;
+  max-width: 420px;
+}
+
+.auth-required-logo {
+  width: 100px;
+  height: auto;
+  margin-bottom: 1.5rem;
+}
+
+.auth-required-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.auth-required-subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
+  line-height: 1.4;
+}
+
+.auth-required-buttons {
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.auth-required-signup-btn {
+  text-transform: none !important;
+  font-weight: 600 !important;
+  padding: 0.6rem 1.5rem !important;
+}
+
+.auth-required-login-btn {
+  text-transform: none !important;
+  font-weight: 600 !important;
+  padding: 0.6rem 1.5rem !important;
+}
+
+@media (max-width: 600px) {
+  .auth-required {
+    min-height: 50vh;
+    padding: 1.5rem;
+  }
+  .auth-required-title {
+    font-size: 1rem;
+  }
+  .auth-required-subtitle {
+    font-size: 0.9rem;
+  }
+}

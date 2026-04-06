@@ -1,5 +1,6 @@
 import axios from "axios";
 import { serverApi } from "../../lib/config";
+import { clearStoredAccessToken } from "../../lib/accessToken";
 import { Table, TableUpdateInput } from "../../lib/types/table";
 
 class TableService {
@@ -17,6 +18,7 @@ class TableService {
       const table = result.data.table;
       localStorage.setItem("tableData", JSON.stringify(table));
       localStorage.removeItem("memberData");
+      clearStoredAccessToken();
       return table;
     } catch (err) {
       console.log("Error, qrLanding: ", err);

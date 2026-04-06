@@ -14,6 +14,9 @@ import "./css/dark-mode.css";
 import ContextProvider from "./app/context/ContextProvider";
 import { LanguageProvider } from "./app/context/LanguageContext";
 import { DarkModeProvider } from "./app/context/DarkModeContext";
+import { setupAxiosAuth } from "./lib/setupAxiosAuth";
+
+setupAxiosAuth();
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);

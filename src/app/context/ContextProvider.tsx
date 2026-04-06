@@ -1,4 +1,5 @@
 import React, { ReactNode, useState, useCallback } from "react";
+import { clearStoredAccessToken } from "../../lib/accessToken";
 import { Member } from "../../lib/types/member";
 import { GlobalContext } from "../hooks/useGlobals";
 import { Table } from "../../lib/types/table";
@@ -24,6 +25,7 @@ const ContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       localStorage.setItem("memberData", JSON.stringify(member));
     } else {
       localStorage.removeItem("memberData");
+      clearStoredAccessToken();
     }
   }, []);
 

@@ -1,0 +1,84 @@
+/* Auth Modal - Signup & Login */
+
+.auth-modal {
+  width: 100%;
+  max-width: 800px;
+}
+
+.auth-modal.mobile .auth-modal-image {
+  display: none;
+}
+
+.auth-modal.mobile .auth-modal-form {
+  margin-left: 0;
+  width: 100%;
+  padding: 1.5rem;
+}
+
+.auth-modal-form-wrapper {
+  width: 100%;
+  max-width: 320px;
+}
+
+/* Helper text above inputs */
+.auth-modal-helper {
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  padding: 0 4px;
+}
+
+.auth-modal-field-group {
+  margin-bottom: 1.25rem;
+}
+
+.auth-modal-field-group:first-of-type {
+  margin-top: 0.75rem;
+}
+
+.auth-modal .MuiTextField-root {
+  width: 100%;
+}
+
+.auth-modal-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  text-align: center;
+}
+
+.auth-modal-submit {
+  margin-top: 1.5rem !important;
+  width: 100% !important;
+  max-width: 200px;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .auth-modal.mobile .auth-modal-form {
+    padding: 1.25rem;
+    min-width: 100%;
+  }
+
+  .auth-modal-form-wrapper {
+    max-width: 100%;
+  }
+
+  .auth-modal-title {
+    font-size: 1.2rem;
+  }
+
+  .auth-modal-helper {
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+
+  .auth-modal-submit {
+    max-width: 100%;
+    padding: 0.85rem 1.5rem !important;
+  }
+}

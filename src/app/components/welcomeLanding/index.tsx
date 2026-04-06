@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 import { Language } from "../../../lib/translations";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import LoginIcon from "@mui/icons-material/Login";
 import "../../../css/welcome-landing.css";
 
 const WELCOME_STORAGE_KEY = "zomin_welcome_completed";
@@ -13,14 +14,6 @@ const languages: { code: Language; label: string }[] = [
   { code: "ru", label: "Русский" },
 ];
 
-// "Choose language" in each of the 4 languages
-const chooseLangTexts: Record<Language, string> = {
-  uz: "Tilni tanlang",
-  ko: "언어를 선택하세요",
-  en: "Choose your language",
-  ru: "Выберите язык",
-};
-
 export function isWelcomeCompleted(): boolean {
   return localStorage.getItem(WELCOME_STORAGE_KEY) === "true";
 }
@@ -29,52 +22,40 @@ export function setWelcomeCompleted(): void {
   localStorage.setItem(WELCOME_STORAGE_KEY, "true");
 }
 
-export default function WelcomeLanding() {
-  const history = useHistory();
-  const { setLanguage } = useLanguage();
-  const [phase, setPhase] = useState<"welcome" | "language">("welcome");
+interface WelcomeLandingProps {
+  setSignupOpen: (open: boolean) => void;
+  setLoginOpen: (open: boolean) => void;
+}
 
-  const handleContinue = () => {
-    setPhase("language");
-  };
+export default function WelcomeLanding(props: WelcomeLandingProps) {
+  const { setSignupOpen, setLoginOpen } = props;
+  const { setLanguage, t } = useLanguage();
+  const [phase, setPhase] = useState<"language" | "auth">("language");
 
   const handleLanguageSelect = (lang: Language) => {
     setLanguage(lang);
+    setPhase("auth");
+  };
+
+  const handleSignupClick = () => {
     setWelcomeCompleted();
-    history.push("/products");
+    setSignupOpen(true);
+  };
+
+  const handleLoginClick = () => {
+    setWelcomeCompleted();
+    setLoginOpen(true);
   };
 
   return (
     <div className="welcome-landing">
       <div className="welcome-landing-content">
-        {phase === "welcome" ? (
+        {phase === "language" ? (
           <>
             <div className="welcome-logo">
               <img src="/icons/zomin.svg" alt="Zomin" />
             </div>
-            <h1 className="welcome-title-uz">
-              Xush kelibsiz!
-            </h1>
-            <p className="welcome-subtitle-uz">
-              Siz Zomin oshxonasiga xush kelibsiz
-            </p>
-            <h2 className="welcome-title-en">Welcome!</h2>
-            <p className="welcome-subtitle-en">
-              Welcome to Zomin Restaurant
-            </p>
-            <button className="welcome-continue-btn" onClick={handleContinue}>
-              Davom etish / Continue
-            </button>
-          </>
-        ) : (
-          <>
-            <div className="welcome-lang-title">
-              {languages.map(({ code }) => (
-                <div key={code} className="welcome-lang-title-item">
-                  {chooseLangTexts[code]}
-                </div>
-              ))}
-            </div>
+            <p className="welcome-lang-title-item">{t("authChooseLang")}</p>
             <div className="welcome-lang-buttons">
               {languages.map(({ code, label }) => (
                 <button
@@ -85,6 +66,34 @@ export default function WelcomeLanding() {
                   {label}
                 </button>
               ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="welcome-logo">
+              <img src="/icons/zomin.svg" alt="Zomin" />
+            </div>
+            <p className="welcome-auth-title">{t("authFirstTimeSignup")}</p>
+            <p className="welcome-auth-subtitle">{t("authBeenHereLogin")}</p>
+            <div className="welcome-auth-buttons">
+              <button
+                className="welcome-lang-btn welcome-auth-signup"
+                onClick={handleSignupClick}
+              >
+                <span className="welcome-btn-icon">
+                  <PersonAddIcon sx={{ fontSize: 20 }} />
+                </span>
+                {t("signup")}
+              </button>
+              <button
+                className="welcome-lang-btn welcome-auth-login"
+                onClick={handleLoginClick}
+              >
+                <span className="welcome-btn-icon">
+                  <LoginIcon sx={{ fontSize: 20 }} />
+                </span>
+                {t("login")}
+              </button>
             </div>
           </>
         )}

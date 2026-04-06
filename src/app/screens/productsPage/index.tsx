@@ -1,10 +1,8 @@
 import React from "react";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
-import { Container } from "@mui/material";
 import ChosenProduct from "./ChosenProduct";
 import Products from "./Products";
 import { CartItem } from "../../../lib/types/search";
-import useDeviceDetect from "../../hooks/useDeviceDetect";
 import "../../../css/products.css";
 
 interface ProductPageProps {
@@ -13,20 +11,18 @@ interface ProductPageProps {
 
 export default function ProductsPage(props: ProductPageProps) {
   const { onAdd } = props;
-  const device = useDeviceDetect();
   const products = useRouteMatch();
-  console.log("products: ", products);
 
-    return (
-      <div className="products-page">
-        <Switch>
-          <Route path={`${products.path}/:productId`}>
-            <ChosenProduct onAdd={onAdd} />
-          </Route>
-          <Route path={`${products.path}`}>
-            <Products onAdd={onAdd} />
-          </Route>
-        </Switch>
-      </div>
-    );
-  }
+  return (
+    <div className="products-page">
+      <Switch>
+        <Route path={`${products.path}/:productId`}>
+          <ChosenProduct onAdd={onAdd} />
+        </Route>
+        <Route path={`${products.path}`}>
+          <Products onAdd={onAdd} />
+        </Route>
+      </Switch>
+    </div>
+  );
+}

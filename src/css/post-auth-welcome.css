@@ -1,0 +1,94 @@
+/* Post Auth Welcome - Link users after signup/login */
+
+.post-auth-welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: 100vh;
+}
+
+.post-auth-welcome-content {
+  text-align: center;
+  padding: 2rem;
+  max-width: 420px;
+}
+
+.post-auth-welcome-logo {
+  margin-bottom: 2rem;
+}
+
+.post-auth-welcome-logo img {
+  width: 120px;
+  height: auto;
+  filter: brightness(1.1);
+}
+
+.post-auth-welcome-title-uz {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #e8d5b7;
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+.post-auth-welcome-subtitle-uz {
+  font-size: 1rem;
+  color: rgba(232, 213, 183, 0.9);
+  margin: 0 0 1.5rem;
+  font-weight: 400;
+}
+
+.post-auth-welcome-title-en {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #d4af37;
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.post-auth-welcome-subtitle-en {
+  font-size: 0.95rem;
+  color: rgba(212, 175, 55, 0.9);
+  margin: 0 0 2rem;
+}
+
+.post-auth-welcome-btn {
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid #d4af37;
+  background: transparent;
+  color: #d4af37;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.post-auth-welcome-btn:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .post-auth-welcome-content {
+    padding: 1.5rem;
+  }
+  .post-auth-welcome-title-uz {
+    font-size: 1.7rem;
+  }
+  .post-auth-welcome-title-en {
+    font-size: 1.4rem;
+  }
+  .post-auth-welcome-btn {
+    padding: 1rem 2rem;
+    width: 100%;
+    max-width: 280px;
+  }
+}

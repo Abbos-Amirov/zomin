@@ -15,7 +15,10 @@ class OrderService {
     this.path = serverApi;
   }
 
-  public async createOrder(input: CartItem[]): Promise<Order> {
+  public async createOrder(
+    input: CartItem[],
+    options?: { memberId?: string; tableId?: string }
+  ): Promise<Order> {
     try {
       const orderItems: OrderItemInput[] = input.map((cartItem: CartItem) => {
         return {
@@ -25,8 +28,12 @@ class OrderService {
         };
       });
 
+      const body: Record<string, unknown> = { orderItems };
+      if (options?.memberId) body.memberId = options.memberId;
+      if (options?.tableId) body.tableId = options.tableId;
+
       const url = this.path + "/order/create";
-      const result = await axios.post(url, orderItems, {
+      const result = await axios.post(url, body, {
         withCredentials: true,
       });
       console.log("createOrder:", result);

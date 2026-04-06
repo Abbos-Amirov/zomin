@@ -86,8 +86,38 @@
 .welcome-lang-title-item {
   font-size: 1.25rem;
   color: rgba(232, 213, 183, 0.95);
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
   font-weight: 500;
+}
+
+/* Auth choice phase */
+.welcome-auth-title {
+  font-size: 1.2rem;
+  color: #e8d5b7;
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+}
+
+.welcome-auth-subtitle {
+  font-size: 1rem;
+  color: rgba(232, 213, 183, 0.9);
+  margin: 0 0 1.5rem;
+}
+
+.welcome-auth-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.welcome-auth-signup {
+  background: rgba(212, 175, 55, 0.3) !important;
+  border-color: #d4af37 !important;
+}
+
+.welcome-auth-login {
+  border-color: #e8d5b7;
 }
 
 .welcome-lang-title-item:last-child {

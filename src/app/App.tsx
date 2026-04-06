@@ -20,13 +20,11 @@ import QrLanding from "./components/qrLanding";
 import TableService from "./services/TableService";
 import CallButton from "./components/callWaiter";
 import { AddToCartAnimationProvider } from "./context/AddToCartAnimation";
-import WelcomeLanding, { isWelcomeCompleted } from "./components/welcomeLanding";
+import ProductsLinkPage from "./screens/productsLinkPage";
 
 export default function App() {
   const location = useLocation();
   const history = useHistory();
-  const showWelcome =
-    !isWelcomeCompleted() && !location.pathname.startsWith("/table/qr/");
   const { setAuthMember, authMember, authTable, setAuthTable } = useGlobals();
   const { cartItems, onAdd, onRemove, onDelete, onDeleteAll } = useBasket();
   const [signupOpen, setSignupOpen] = useState<boolean>(false);
@@ -82,7 +80,7 @@ export default function App() {
     const table = new TableService();
     try {
       if (!authTable) throw new Error(Messages.error6);
-      const result = await table.clickTableCall(id);
+      await table.clickTableCall(id);
       sweetTopSuccessAlert("The waiter is coming!", 700);
     } catch (err) {
       console.log(err);
@@ -90,9 +88,8 @@ export default function App() {
     }
   };
 
-  if (showWelcome) {
-    return <WelcomeLanding />;
-  }
+  // Link users must auth to access products, orders, help (QR users skip)
+  const needsAuth = !authTable && !authMember;
 
   return (
     <AddToCartAnimationProvider>
@@ -110,23 +107,42 @@ export default function App() {
           handleLogoutClick={handleLogoutClick}
       />
       <Switch>
+        <Route path="/products-link">
+          <ProductsLinkPage
+            onAdd={onAdd}
+            onSignup={() => setSignupOpen(true)}
+            onLogin={() => setLoginOpen(true)}
+          />
+        </Route>
         <Route path="/products">
-          <ProductsPage onAdd={onAdd} />
+          {needsAuth ? (
+            <Redirect to="/products-link" />
+          ) : (
+            <ProductsPage onAdd={onAdd} />
+          )}
         </Route>
         <Route path="/orders">
-          <OrdersPage callHandler={callHandler} />
+          {needsAuth ? (
+            <Redirect to="/products-link" />
+          ) : (
+            <OrdersPage callHandler={callHandler} />
+          )}
         </Route>
         <Route path="/member-page">
           <UserPage />
         </Route>
         <Route path="/help">
-          <HelpPage />
+          {needsAuth ? (
+            <Redirect to="/products-link" />
+          ) : (
+            <HelpPage />
+          )}
         </Route>
         <Route path={"/table/qr/:id"}>
           <QrLanding />
         </Route>
         <Route exact path="/">
-          <Redirect to="/products" />
+          {authTable ? <Redirect to="/products" /> : <Redirect to="/products-link" />}
         </Route>
       </Switch>
       <Footer />

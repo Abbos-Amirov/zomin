@@ -56,6 +56,7 @@ const productsRetriever = createSelector(retrieveProducts, (products) => ({
 
 interface ProductProps {
   onAdd: (item: CartItem) => void;
+  basePath?: string;
 }
 
 const services = [
@@ -82,7 +83,7 @@ const services = [
 ];
 
 export default function Products(props: ProductProps) {
-  const { onAdd } = props;
+  const { onAdd, basePath = "/products" } = props;
   const { setProducts } = actionDispatch(useDispatch());
   const { products } = useSelector(productsRetriever);
   const [productSearch, setProductSearch] = useState<ProductInquiry>({
@@ -200,7 +201,7 @@ export default function Products(props: ProductProps) {
   };
 
   const chooseDishHandler = (product: Product) => {
-    history.push(`/products/${product._id}`, { product });
+    history.push(`${basePath}/${product._id}`, { product });
   };
 
   if (device === "mobile") {

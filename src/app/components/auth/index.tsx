@@ -6,17 +6,23 @@ import {
   Fab,
   Stack,
   TextField,
+  Typography,
+  Box,
 } from "@mui/material";
 import styled from "styled-components";
 import LoginIcon from "@mui/icons-material/Login";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { T } from "../../../lib/types/common";
 import { Messages } from "../../../lib/config";
 import { LoginInput, MemberInput } from "../../../lib/types/member";
 import MemberService from "../../services/MemberService";
 import { sweetErrorHandling } from "../../../lib/sweetAlert";
 import { useGlobals } from "../../hooks/useGlobals";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { MemberType } from "../../../lib/enums/member.enum";
+import { useLanguage } from "../../context/LanguageContext";
+import useDeviceDetect from "../../hooks/useDeviceDetect";
+import "../../../css/auth-modal.css";
 
 const ModalImg = styled.img`
   width: 62%;
@@ -44,6 +50,11 @@ interface AuthenticationModalProps {
 export default function AuthenticationModal(props: AuthenticationModalProps) {
   const { signupOpen, loginOpen, handleSignupClose, handleLoginClose } = props;
   const history = useHistory();
+  const location = useLocation();
+  const redirectToProducts = location.pathname.startsWith("/products-link") ? "/products-link" : "/products";
+  const { t } = useLanguage();
+  const device = useDeviceDetect();
+  const isMobile = device === "mobile";
   const [memberNick, setMemberNick] = useState<string>("");
   const [memberPhone, setMemberPhone] = useState<string>("");
   const [memberPassword, setMemberPassword] = useState<string>("");
@@ -75,7 +86,7 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
       setAuthTable(null);
       setMemberPassword("");
       handleSignupClose();
-      history.push("/member-page");
+      history.push(redirectToProducts);
     } catch (err) {
       handleSignupClose();
       sweetErrorHandling(err);
@@ -94,7 +105,7 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
       setAuthTable(null);
       setMemberPassword("");
       handleLoginClose();
-      history.push("/member-page");
+      history.push(redirectToProducts);
     } catch (err) {
       handleLoginClose();
       sweetErrorHandling(err);
@@ -108,59 +119,66 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
         open={signupOpen}
         onClose={handleSignupClose}
         TransitionComponent={Transition}
+        fullScreen={isMobile}
         maxWidth={false}
         PaperProps={{
+          className: `auth-modal ${isMobile ? "mobile" : ""}`,
           sx: {
-            p: 2,
+            p: isMobile ? 0 : 2,
             border: "2px solid #000",
             boxShadow: 5,
-            width: 800,
+            width: isMobile ? "100%" : 800,
+            maxWidth: isMobile ? "100%" : 800,
           },
         }}
       >
         <DialogContent sx={{ p: 0 }}>
-          <Stack direction="row">
-            {/* LEFT SIDE IMAGE */}
-            <ModalImg src={"/img/auth.webp"} alt="camera" />
-
-            {/* RIGHT SIDE FORM */}
-            <Stack sx={{ ml: "69px", alignItems: "center" }}>
-              <h2>Signup Form</h2>
-
-              <TextField
-                sx={{ mt: "7px" }}
-                id="signup-username"
-                label="username"
-                variant="outlined"
-                onChange={handleUsername}
-              />
-
-              <TextField
-                sx={{ my: "17px" }}
-                id="signup-phone"
-                label="phone number"
-                variant="outlined"
-                onChange={handlePhone}
-              />
-
-              <TextField
-                id="signup-password"
-                label="password"
-                type="password"
-                variant="outlined"
-                onChange={handlePassword}
-                onKeyDown={handlePasswordKeyDown}
-              />
-
-              <Fab
-                sx={{ mt: "30px", width: "120px" }}
-                variant="extended"
-                color="primary"
-                onClick={handleSignupRequest}
-              >
-                <LoginIcon sx={{ mr: 1 }} />
-                Signup
-              </Fab>
+          <Stack direction="row" className="auth-modal-inner">
+            {!isMobile && <ModalImg src={"/img/auth.webp"} alt="camera" className="auth-modal-image" />}
+            <Stack className="auth-modal-form" sx={{ alignItems: "center", justifyContent: "center" }}>
+              <Typography className="auth-modal-title">{t("signup")}</Typography>
+              <Box className="auth-modal-form-wrapper">
+                <Box className="auth-modal-field-group">
+                  <Typography className="auth-modal-helper">{t("signupNameHelper")}</Typography>
+                  <TextField
+                    id="signup-username"
+                    label={t("signupUsername")}
+                    variant="outlined"
+                    fullWidth
+                    onChange={handleUsername}
+                  />
+                </Box>
+                <Box className="auth-modal-field-group">
+                  <TextField
+                    id="signup-phone"
+                    label={t("signupPhone")}
+                    variant="outlined"
+                    fullWidth
+                    onChange={handlePhone}
+                  />
+                </Box>
+                <Box className="auth-modal-field-group">
+                  <Typography className="auth-modal-helper">{t("signupPasswordHelper")}</Typography>
+                  <TextField
+                    id="signup-password"
+                    label={t("signupPassword")}
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                    onChange={handlePassword}
+                    onKeyDown={handlePasswordKeyDown}
+                  />
+                </Box>
+                <Fab
+                  className="auth-modal-submit"
+                  variant="extended"
+                  color="primary"
+                  onClick={handleSignupRequest}
+                >
+                  <PersonAddIcon sx={{ mr: 1 }} />
+                  {t("signup")}
+                </Fab>
+              </Box>
             </Stack>
           </Stack>
         </DialogContent>
@@ -171,45 +189,57 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
         open={loginOpen}
         onClose={handleLoginClose}
         TransitionComponent={Transition}
+        fullScreen={isMobile}
         maxWidth={false}
         PaperProps={{
+          className: `auth-modal ${isMobile ? "mobile" : ""}`,
           sx: {
-            p: 2,
+            p: isMobile ? 0 : 2,
             border: "2px solid #000",
             boxShadow: 5,
-            width: 700,
+            width: isMobile ? "100%" : 700,
+            maxWidth: isMobile ? "100%" : 700,
           },
         }}
       >
         <DialogContent sx={{ p: 0 }}>
-          <Stack direction="row">
-            <ModalImg src={"/img/auth.webp"} alt="camera" />
-            <Stack sx={{ ml: "65px", mt: "25px", alignItems: "center" }}>
-              <h2>Login Form</h2>
-              <TextField
-                id="login-username"
-                label="username"
-                variant="outlined"
-                sx={{ my: "10px" }}
-                onChange={handleUsername}
-              />
-              <TextField
-                id="login-password"
-                label="password"
-                variant="outlined"
-                type="password"
-                onChange={handlePassword}
-                onKeyDown={handlePasswordKeyDown}
-              />
-              <Fab
-                sx={{ mt: "27px", width: "120px" }}
-                variant="extended"
-                color="primary"
-                onClick={handleLoginRequest}
-              >
-                <LoginIcon sx={{ mr: 1 }} />
-                Login
-              </Fab>
+          <Stack direction="row" className="auth-modal-inner">
+            {!isMobile && <ModalImg src={"/img/auth.webp"} alt="camera" className="auth-modal-image" />}
+            <Stack className="auth-modal-form" sx={{ alignItems: "center", justifyContent: "center" }}>
+              <Typography className="auth-modal-title">{t("loginTitle")}</Typography>
+              <Box className="auth-modal-form-wrapper">
+                <Box className="auth-modal-field-group">
+                  <Typography className="auth-modal-helper">{t("signupNameHelper")}</Typography>
+                  <TextField
+                    id="login-username"
+                    label={t("loginUsername")}
+                    variant="outlined"
+                    fullWidth
+                    onChange={handleUsername}
+                  />
+                </Box>
+                <Box className="auth-modal-field-group">
+                  <Typography className="auth-modal-helper">{t("signupPasswordHelper")}</Typography>
+                  <TextField
+                    id="login-password"
+                    label={t("loginPassword")}
+                    variant="outlined"
+                    type="password"
+                    fullWidth
+                    onChange={handlePassword}
+                    onKeyDown={handlePasswordKeyDown}
+                  />
+                </Box>
+                <Fab
+                  className="auth-modal-submit"
+                  variant="extended"
+                  color="primary"
+                  onClick={handleLoginRequest}
+                >
+                  <LoginIcon sx={{ mr: 1 }} />
+                  {t("login")}
+                </Fab>
+              </Box>
             </Stack>
           </Stack>
         </DialogContent>

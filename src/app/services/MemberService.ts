@@ -1,11 +1,22 @@
 import axios from "axios";
 import { serverApi } from "../../lib/config";
 import {
+  clearStoredAccessToken,
+  persistAccessTokenFromAuthPayload,
+} from "../../lib/accessToken";
+import {
   LoginInput,
   Member,
   MemberInput,
   MemberUpdateInput,
 } from "../../lib/types/member";
+
+function memberForStorage(raw: Member): Member {
+  const o = { ...raw } as Record<string, unknown>;
+  delete o.accessToken;
+  delete o.token;
+  return o as unknown as Member;
+}
 
 class MemberService {
   private readonly path: string;
@@ -44,7 +55,8 @@ class MemberService {
       const result = await axios.post(url, input, { withCredentials: true });
       console.log("signup:", result);
 
-      const member: Member = result.data.member;
+      persistAccessTokenFromAuthPayload(result.data);
+      const member: Member = memberForStorage(result.data.member);
       console.log("member:", member);
       localStorage.setItem("memberData", JSON.stringify(member));
       localStorage.removeItem("tableData");
@@ -61,7 +73,8 @@ class MemberService {
       const result = await axios.post(url, input, { withCredentials: true });
       console.log("login:", result);
 
-      const member: Member = result.data.member;
+      persistAccessTokenFromAuthPayload(result.data);
+      const member: Member = memberForStorage(result.data.member);
       console.log("member:", member);
       localStorage.setItem("memberData", JSON.stringify(member));
       localStorage.removeItem("tableData");
@@ -77,6 +90,7 @@ class MemberService {
       const url = this.path + "/member/logout";
       const result = await axios.post(url, {}, { withCredentials: true });
       console.log("logout:", result);
+      clearStoredAccessToken();
       localStorage.removeItem("memberData");
     } catch (err) {
       console.log("Error, logout:", err);

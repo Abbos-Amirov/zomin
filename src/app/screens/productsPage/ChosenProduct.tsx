@@ -64,10 +64,11 @@ const sizeKeys: Record<string, string> = {
 
 interface ChosenProductProps {
   onAdd: (item: CartItem) => void;
+  basePath?: string;
 }
 
 export default function ChosenProduct(props: ChosenProductProps) {
-  const { onAdd } = props;
+  const { onAdd, basePath = "/products" } = props;
   const { productId } = useParams<{ productId: string }>();
   const history = useHistory();
   const location = useLocation<{ product?: Product }>();
@@ -131,7 +132,7 @@ export default function ChosenProduct(props: ChosenProductProps) {
             py: 1,
             cursor: "pointer",
           }}
-          onClick={() => history.push("/products")}
+          onClick={() => history.push(basePath)}
         >
           <ArrowBackIcon fontSize="small" />
           <Typography sx={{ fontSize: 14, fontWeight: 600 }}>{t("backToProducts")}</Typography>
@@ -252,7 +253,7 @@ export default function ChosenProduct(props: ChosenProductProps) {
           {/* Back Button */}
           <Button
             startIcon={<ArrowBackIcon />}
-            onClick={() => history.push("/products")}
+            onClick={() => history.push(basePath)}
             sx={{
               mb: 3,
               color: "#3776CC",
