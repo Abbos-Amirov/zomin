@@ -71,5 +71,15 @@ export interface LinkOrderCreateInput {
   orderType?: OrderType;
 }
 
+/** Olib ketish — stol yo‘q (POST /order/link-takeout) */
+export interface LinkTakeoutOrderCreateInput {
+  restaurantId: string;
+  customerName: string;
+  customerPhone: string;
+  arrivalInMinutes: number;
+  orderItems: LinkOrderItemInput[];
+  orderType?: OrderType;
+}
+
 
 

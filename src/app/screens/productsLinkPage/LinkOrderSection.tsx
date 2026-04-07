@@ -149,6 +149,14 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
     });
   }, [tableDialogOpen, tables]);
 
+  useEffect(() => {
+    if (orderType === OrderType.TAKEOUT) {
+      setTableId("");
+      setSelectedTable(null);
+      setTableDialogOpen(false);
+    }
+  }, [orderType]);
+
   const openTablePicker = () => {
     setTableDialogOpen(true);
     void loadTables();
@@ -187,12 +195,15 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
       customerPhone: customerPhone.trim(),
     };
     if (
-      !trimmed.tableId ||
       !trimmed.customerName ||
       !trimmed.customerPhone ||
       Number.isNaN(arrivalInMinutes) ||
       arrivalInMinutes < 0
     ) {
+      sweetErrorHandling(new Error(t("linkFillAllFields"))).then();
+      return;
+    }
+    if (orderType === OrderType.TABLE && !trimmed.tableId) {
       sweetErrorHandling(new Error(t("linkFillAllFields"))).then();
       return;
     }
@@ -204,18 +215,31 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
     setSubmitting(true);
     try {
       const order = new OrderService();
-      await order.createLinkOrder({
-        restaurantId: DEFAULT_RESTAURANT_ID.trim(),
-        tableId: trimmed.tableId,
+      const orderItems = cartItems.map((c) => ({
+        productId: c._id,
+        quantity: c.quantity,
+      }));
+      const restaurantId = DEFAULT_RESTAURANT_ID.trim();
+      const common = {
+        restaurantId,
         customerName: trimmed.customerName,
         customerPhone: trimmed.customerPhone,
         arrivalInMinutes: Math.floor(arrivalInMinutes),
-        orderItems: cartItems.map((c) => ({
-          productId: c._id,
-          quantity: c.quantity,
-        })),
-        orderType,
-      });
+        orderItems,
+      };
+
+      if (orderType === OrderType.TAKEOUT) {
+        await order.createLinkTakeoutOrder({
+          ...common,
+          orderType: OrderType.TAKEOUT,
+        });
+      } else {
+        await order.createLinkOrder({
+          ...common,
+          tableId: trimmed.tableId,
+          orderType: OrderType.TABLE,
+        });
+      }
       onDeleteAll();
       await sweetTopSuccessAlert(t("linkOrderSuccess"), 900);
       history.push("/orders");
@@ -234,123 +258,144 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
       </Typography>
 
       <Stack spacing={2} className="link-order-form">
-        <Box
-          className="link-table-field-wrap"
-          onClick={() => openTablePicker()}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              openTablePicker();
-            }
-          }}
-          role="button"
-          tabIndex={0}
-          sx={{ cursor: "pointer" }}
-        >
-          <TextField
-            required
-            fullWidth
-            size="small"
-            label={t("linkTableSelect")}
-            placeholder={t("linkTableSelectPlaceholder")}
-            value={selectedTable ? String(selectedTable.tableNumber) : ""}
-            InputProps={{
-              readOnly: true,
-              endAdornment: (
-                <InputAdornment position="end">
-                  {tablesLoading ? <CircularProgress size={18} /> : <ArrowDropDownIcon />}
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
-        <Dialog
-          open={tableDialogOpen}
-          onClose={closeTablePicker}
-          maxWidth="md"
-          fullWidth
-          scroll="paper"
-          className="link-table-dialog"
-          PaperProps={{ className: "link-table-dialog-paper" }}
-        >
-          <DialogTitle className="link-table-dialog-title">{t("linkTableDialogTitle")}</DialogTitle>
-          <DialogContent dividers className="link-table-dialog-content">
-            {showAllBusyBanner ? (
-              <Box className="link-table-all-busy-banner">
-                <Typography variant="subtitle1" className="link-table-all-busy-title">
-                  {t("linkAllTablesBusyTitle")}
-                </Typography>
-                {queueTicket !== null ? (
-                  <Typography variant="h4" className="link-table-queue-number">
-                    {t("linkQueueNumberLabel")}: {queueTicket}
-                  </Typography>
-                ) : null}
-                <Typography variant="body2" className="link-table-kutaman">
-                  {t("linkAllTablesKutaman")}
-                </Typography>
-              </Box>
-            ) : null}
-            {tablesLoading ? (
-              <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-                <CircularProgress size={40} />
-              </Box>
-            ) : tables.length === 0 ? (
-              <Typography color="text.secondary" sx={{ py: 4, textAlign: "center" }} variant="body1">
-                {tablesLoadError ? t("linkTableLoadError") : t("linkTableEmptyList")}
-              </Typography>
-            ) : (
-              <Box className="link-table-cards-grid">
-                {tables.map((option) => {
-                  const kindLbl = tableKindLabel(option, t);
-                  return (
-                  <Box
-                    key={option._id}
-                    component="button"
-                    type="button"
-                    className={
-                      "link-table-card" +
-                      (selectedTable?._id === option._id ? " link-table-card--selected" : "") +
-                      (option.tableStatus === TableStatus.OCCUPIED ? " link-table-card--occupied" : "")
-                    }
-                    onClick={() => selectTableRow(option)}
-                  >
-                    <Box className="link-table-card-icon" aria-hidden>
-                      <TableRestaurantIcon className="link-table-card-icon-svg" />
-                    </Box>
-                    <Typography className="link-table-card-number" component="span">
-                      {option.tableNumber}
+        <FormControl component="fieldset">
+          <FormLabel component="legend">{t("linkOrderType")}</FormLabel>
+          <RadioGroup
+            row
+            value={orderType}
+            onChange={(e) => setOrderType(e.target.value as OrderType)}
+          >
+            <FormControlLabel value={OrderType.TABLE} control={<Radio size="small" />} label={t("linkOrderTypeTable")} />
+            <FormControlLabel
+              value={OrderType.TAKEOUT}
+              control={<Radio size="small" />}
+              label={t("linkOrderTypeTakeout")}
+            />
+          </RadioGroup>
+        </FormControl>
+
+        {orderType === OrderType.TABLE ? (
+          <>
+            <Box
+              className="link-table-field-wrap"
+              onClick={() => openTablePicker()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  openTablePicker();
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              sx={{ cursor: "pointer" }}
+            >
+              <TextField
+                required
+                fullWidth
+                size="small"
+                label={t("linkTableSelect")}
+                placeholder={t("linkTableSelectPlaceholder")}
+                value={selectedTable ? String(selectedTable.tableNumber) : ""}
+                InputProps={{
+                  readOnly: true,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      {tablesLoading ? <CircularProgress size={18} /> : <ArrowDropDownIcon />}
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+            <Dialog
+              open={tableDialogOpen}
+              onClose={closeTablePicker}
+              maxWidth="md"
+              fullWidth
+              scroll="paper"
+              className="link-table-dialog"
+              PaperProps={{ className: "link-table-dialog-paper" }}
+            >
+              <DialogTitle className="link-table-dialog-title">{t("linkTableDialogTitle")}</DialogTitle>
+              <DialogContent dividers className="link-table-dialog-content">
+                {showAllBusyBanner ? (
+                  <Box className="link-table-all-busy-banner">
+                    <Typography variant="subtitle1" className="link-table-all-busy-title">
+                      {t("linkAllTablesBusyTitle")}
                     </Typography>
-                    <Box className="link-table-card-inner">
-                      <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap className="link-table-card-chips">
-                        {kindLbl ? (
-                          <Chip
-                            size="small"
-                            variant="filled"
-                            color="default"
-                            className="link-table-kind-chip"
-                            label={kindLbl}
-                          />
-                        ) : null}
-                        <Chip
-                          size="small"
-                          className="link-table-card-status"
-                          color={tableStatusColor(option.tableStatus as TableStatus)}
-                          label={t(`tableStatus_${String(option.tableStatus)}` as never)}
-                        />
-                      </Stack>
-                      {option.tableType ? (
-                        <Typography variant="caption" className="link-table-card-type-line" component="span">
-                          {t("linkTableTypeShort")}: {option.tableType}
-                        </Typography>
-                      ) : null}
-                    </Box>
+                    {queueTicket !== null ? (
+                      <Typography variant="h4" className="link-table-queue-number">
+                        {t("linkQueueNumberLabel")}: {queueTicket}
+                      </Typography>
+                    ) : null}
+                    <Typography variant="body2" className="link-table-kutaman">
+                      {t("linkAllTablesKutaman")}
+                    </Typography>
                   </Box>
-                  );
-                })}
-              </Box>
-            )}
-          </DialogContent>
-        </Dialog>
+                ) : null}
+                {tablesLoading ? (
+                  <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+                    <CircularProgress size={40} />
+                  </Box>
+                ) : tables.length === 0 ? (
+                  <Typography color="text.secondary" sx={{ py: 4, textAlign: "center" }} variant="body1">
+                    {tablesLoadError ? t("linkTableLoadError") : t("linkTableEmptyList")}
+                  </Typography>
+                ) : (
+                  <Box className="link-table-cards-grid">
+                    {tables.map((option) => {
+                      const kindLbl = tableKindLabel(option, t);
+                      return (
+                        <Box
+                          key={option._id}
+                          component="button"
+                          type="button"
+                          className={
+                            "link-table-card" +
+                            (selectedTable?._id === option._id ? " link-table-card--selected" : "") +
+                            (option.tableStatus === TableStatus.OCCUPIED ? " link-table-card--occupied" : "")
+                          }
+                          onClick={() => selectTableRow(option)}
+                        >
+                          <Box className="link-table-card-icon" aria-hidden>
+                            <TableRestaurantIcon className="link-table-card-icon-svg" />
+                          </Box>
+                          <Typography className="link-table-card-number" component="span">
+                            {option.tableNumber}
+                          </Typography>
+                          <Box className="link-table-card-inner">
+                            <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap className="link-table-card-chips">
+                              {kindLbl ? (
+                                <Chip
+                                  size="small"
+                                  variant="filled"
+                                  color="default"
+                                  className="link-table-kind-chip"
+                                  label={kindLbl}
+                                />
+                              ) : null}
+                              <Chip
+                                size="small"
+                                className="link-table-card-status"
+                                color={tableStatusColor(option.tableStatus as TableStatus)}
+                                label={t(`tableStatus_${String(option.tableStatus)}` as never)}
+                              />
+                            </Stack>
+                            {option.tableType ? (
+                              <Typography variant="caption" className="link-table-card-type-line" component="span">
+                                {t("linkTableTypeShort")}: {option.tableType}
+                              </Typography>
+                            ) : null}
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                )}
+              </DialogContent>
+            </Dialog>
+          </>
+        ) : null}
+
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <TextField
             required
@@ -370,33 +415,16 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
             type="tel"
           />
         </Stack>
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }}>
-          <TextField
-            required
-            label={t("linkArrivalMinutes")}
-            type="number"
-            value={arrivalInMinutes}
-            onChange={(e) => setArrivalInMinutes(Number(e.target.value))}
-            size="small"
-            inputProps={{ min: 0 }}
-            sx={{ maxWidth: 200 }}
-          />
-          <FormControl component="fieldset">
-            <FormLabel component="legend">{t("linkOrderType")}</FormLabel>
-            <RadioGroup
-              row
-              value={orderType}
-              onChange={(e) => setOrderType(e.target.value as OrderType)}
-            >
-              <FormControlLabel value={OrderType.TABLE} control={<Radio size="small" />} label={t("linkOrderTypeTable")} />
-              <FormControlLabel
-                value={OrderType.TAKEOUT}
-                control={<Radio size="small" />}
-                label={t("linkOrderTypeTakeout")}
-              />
-            </RadioGroup>
-          </FormControl>
-        </Stack>
+        <TextField
+          required
+          label={t("linkArrivalMinutes")}
+          type="number"
+          value={arrivalInMinutes}
+          onChange={(e) => setArrivalInMinutes(Number(e.target.value))}
+          size="small"
+          inputProps={{ min: 0 }}
+          sx={{ maxWidth: 200 }}
+        />
       </Stack>
 
       <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>

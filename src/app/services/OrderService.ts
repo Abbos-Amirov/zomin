@@ -3,6 +3,7 @@ import { serverApi } from "../../lib/config";
 import { CartItem } from "../../lib/types/search";
 import {
   LinkOrderCreateInput,
+  LinkTakeoutOrderCreateInput,
   Order,
   OrderInquiry,
   OrderItemInput,
@@ -25,6 +26,19 @@ class OrderService {
       return result.data;
     } catch (err) {
       console.log("Error. createLinkOrder: ", err);
+      throw err;
+    }
+  }
+
+  /** Link flow: olib ketish — stolsiz (backend: POST /order/link-takeout) */
+  public async createLinkTakeoutOrder(input: LinkTakeoutOrderCreateInput): Promise<Order> {
+    try {
+      const url = this.path + "/order/link-takeout";
+      const result = await axios.post(url, input, { withCredentials: true });
+      console.log("createLinkTakeoutOrder:", result);
+      return result.data;
+    } catch (err) {
+      console.log("Error. createLinkTakeoutOrder: ", err);
       throw err;
     }
   }

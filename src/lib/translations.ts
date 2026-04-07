@@ -107,7 +107,7 @@ export const translations: Record<Language, Record<string, string>> = {
     linkCustomerPhone: "Telefon",
     linkArrivalMinutes: "Necha daqiqada kelasiz?",
     linkOrderType: "Buyurtma turi",
-    linkOrderTypeTable: "Stolda",
+    linkOrderTypeTable: "O'tirib yeyish",
     linkOrderTypeTakeout: "Olib ketish",
     linkCartSection: "Tanlangan taomlar",
     linkSubmitOrder: "Buyurtma berish",
