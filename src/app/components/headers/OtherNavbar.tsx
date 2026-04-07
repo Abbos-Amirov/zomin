@@ -7,7 +7,7 @@ import {
   MenuItem,
   Stack,
 } from "@mui/material";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import Basket from "./Basket";
 import { CartItem } from "../../../lib/types/search";
 import { useGlobals } from "../../hooks/useGlobals";
@@ -16,6 +16,10 @@ import { Logout } from "@mui/icons-material";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { RESTAURANT_NAME } from "../../../lib/config";
 import { useLanguage } from "../../context/LanguageContext";
+import {
+  getMenuProductsPath,
+  isMenuProductsActive,
+} from "../../../lib/menuProductsPath";
 import LanguageSwitcher from "./LanguageSwitcher";
 import DarkModeToggle from "./DarkModeToggle";
 import "../../../css/mobile/navbar.css";
@@ -34,6 +38,8 @@ interface OtherNavbarProps {
   handleLogoutClick: (
     e: React.MouseEvent<HTMLLIElement>
   ) => void | Promise<void>;
+  /** Hide cart icon (e.g. link flow shows cart on page) */
+  hideBasket?: boolean;
 }
 
 export default function OtherNavbar(props: OtherNavbarProps) {
@@ -49,8 +55,11 @@ export default function OtherNavbar(props: OtherNavbarProps) {
     anchorEl,
     handleCloseLogout,
     handleLogoutClick,
+    hideBasket,
   } = props;
   const { authMember, authTable } = useGlobals();
+  const location = useLocation();
+  const menuProductsPath = getMenuProductsPath(authTable);
   const device = useDeviceDetect();
   const { t } = useLanguage();
 
@@ -69,7 +78,13 @@ export default function OtherNavbar(props: OtherNavbarProps) {
 
             <Stack className="links mobile-navbar-right">
               <Box className={"hover-line"}>
-                <NavLink to="/products" activeClassName="underline">
+                <NavLink
+                  to={menuProductsPath}
+                  isActive={() =>
+                    isMenuProductsActive(location.pathname, menuProductsPath)
+                  }
+                  activeClassName="underline"
+                >
                   {t("menu")}
                 </NavLink>
               </Box>
@@ -85,13 +100,15 @@ export default function OtherNavbar(props: OtherNavbarProps) {
                   </NavLink>
                 </Box>
               )}
-              <Basket
-                cartItems={cartItems}
-                onAdd={onAdd}
-                onRemove={onRemove}
-                onDelete={onDelete}
-                onDeleteAll={onDeleteAll}
-              />
+              {!hideBasket && (
+                <Basket
+                  cartItems={cartItems}
+                  onAdd={onAdd}
+                  onRemove={onRemove}
+                  onDelete={onDelete}
+                  onDeleteAll={onDeleteAll}
+                />
+              )}
               <LanguageSwitcher />
               <DarkModeToggle />
             </Stack>
@@ -116,7 +133,13 @@ export default function OtherNavbar(props: OtherNavbarProps) {
                 </Box>
               )}
               <Box className={"hover-line"}>
-                <NavLink to="/products" activeClassName="underline">
+                <NavLink
+                  to={menuProductsPath}
+                  isActive={() =>
+                    isMenuProductsActive(location.pathname, menuProductsPath)
+                  }
+                  activeClassName="underline"
+                >
                   {t("products")}
                 </NavLink>
               </Box>
@@ -140,13 +163,15 @@ export default function OtherNavbar(props: OtherNavbarProps) {
                 </NavLink>
               </Box>
 
-              <Basket
-                cartItems={cartItems}
-                onAdd={onAdd}
-                onRemove={onRemove}
-                onDelete={onDelete}
-                onDeleteAll={onDeleteAll}
-              />
+              {!hideBasket && (
+                <Basket
+                  cartItems={cartItems}
+                  onAdd={onAdd}
+                  onRemove={onRemove}
+                  onDelete={onDelete}
+                  onDeleteAll={onDeleteAll}
+                />
+              )}
               <LanguageSwitcher />
               <DarkModeToggle />
 

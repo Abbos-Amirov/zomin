@@ -1,5 +1,18 @@
 export const serverApi: string = process.env.REACT_APP_API_URL || "http://localhost:4009";
 
+/**
+ * GET /table/all — alohida host (ixtiyoriy).
+ * Agar bo‘sh bo‘lsa, serverApi ishlatiladi.
+ * Masalan: asosiy API VPSda, stollar ro‘yxati faqat localhostda bo‘lsa —
+ * REACT_APP_TABLE_API_URL=http://localhost:4009
+ */
+export const tableApiBase: string =
+  (process.env.REACT_APP_TABLE_API_URL && process.env.REACT_APP_TABLE_API_URL.trim()) ||
+  serverApi;
+
+/** Optional default for link-order flow; can still be edited in the form */
+export const DEFAULT_RESTAURANT_ID: string = process.env.REACT_APP_RESTAURANT_ID || "";
+
 export const RESTAURANT_NAME = "Zomin";
 
 export const CURRENCY_SYMBOL = "₩"; // Won

@@ -12,3 +12,8 @@ code {
     monospace;
 }
 
+/* MUI Dialog z-index ~1300; SweetAlert2 default pastroq — modal ostida qolmasin */
+.swal2-container {
+  z-index: 20000 !important;
+}
+

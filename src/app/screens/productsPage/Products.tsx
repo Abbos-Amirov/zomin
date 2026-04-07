@@ -57,6 +57,8 @@ const productsRetriever = createSelector(retrieveProducts, (products) => ({
 interface ProductProps {
   onAdd: (item: CartItem) => void;
   basePath?: string;
+  /** When true (e.g. link flow with form above), reduce top margin under navbar */
+  compactTop?: boolean;
 }
 
 const services = [
@@ -83,7 +85,7 @@ const services = [
 ];
 
 export default function Products(props: ProductProps) {
-  const { onAdd, basePath = "/products" } = props;
+  const { onAdd, basePath = "/products", compactTop } = props;
   const { setProducts } = actionDispatch(useDispatch());
   const { products } = useSelector(productsRetriever);
   const [productSearch, setProductSearch] = useState<ProductInquiry>({
@@ -389,7 +391,7 @@ export default function Products(props: ProductProps) {
       <div className="products-page">
         <div className="products">
           <Container>
-            <Stack flexDirection={"column"} alignItems={"center"} mt="77px">
+            <Stack flexDirection={"column"} alignItems={"center"} mt={compactTop ? "12px" : "77px"}>
               <Stack
                 flexDirection={"row"}
                 justifyContent={"right"}

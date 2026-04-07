@@ -105,11 +105,16 @@ export default function App() {
           handleLogoutOpen={handleLogoutOpen}
           handleCloseLogout={handleCloseLogout}
           handleLogoutClick={handleLogoutClick}
+          hideBasket={location.pathname.startsWith("/products-link")}
       />
       <Switch>
         <Route path="/products-link">
           <ProductsLinkPage
+            cartItems={cartItems}
             onAdd={onAdd}
+            onRemove={onRemove}
+            onDelete={onDelete}
+            onDeleteAll={onDeleteAll}
             onSignup={() => setSignupOpen(true)}
             onLogin={() => setLoginOpen(true)}
           />

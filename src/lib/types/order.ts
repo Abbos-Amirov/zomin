@@ -1,5 +1,3 @@
-
-
 import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "../enums/order.enum";
 import { Product } from "./product";
 
@@ -54,6 +52,23 @@ export interface OrderInquiry {
   payMeth?: PaymentMethod;
   search?: string;
   orderStatus?: OrderStatus;
+}
+
+/** Link / pre-order flow (POST body matches backend contract) */
+export interface LinkOrderItemInput {
+  productId: string;
+  quantity: number;
+}
+
+export interface LinkOrderCreateInput {
+  restaurantId: string;
+  tableId: string;
+  customerName: string;
+  customerPhone: string;
+  arrivalInMinutes: number;
+  orderItems: LinkOrderItemInput[];
+  /** Defaults to TABLE on backend if omitted */
+  orderType?: OrderType;
 }
 
 

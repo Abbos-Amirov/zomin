@@ -7,8 +7,8 @@ import ChosenProduct from "../productsPage/ChosenProduct";
 import Products from "../productsPage/Products";
 import { CartItem } from "../../../lib/types/search";
 import AuthRequired from "../../components/auth/AuthRequired";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import LoginIcon from "@mui/icons-material/Login";
+import LinkOrderSection from "./LinkOrderSection";
+import { setMenuProductsPath } from "../../../lib/menuProductsPath";
 import "../../../css/products.css";
 import "../../../css/welcome-landing.css";
 import "../../../css/auth-required.css";
@@ -21,17 +21,25 @@ const languages: { code: Language; label: string }[] = [
 ];
 
 interface ProductsLinkPageProps {
+  cartItems: CartItem[];
   onAdd: (item: CartItem) => void;
+  onRemove: (item: CartItem) => void;
+  onDelete: (item: CartItem) => void;
+  onDeleteAll: () => void;
   onSignup: () => void;
   onLogin: () => void;
 }
 
 export default function ProductsLinkPage(props: ProductsLinkPageProps) {
-  const { onAdd, onSignup, onLogin } = props;
+  const { cartItems, onAdd, onRemove, onDelete, onDeleteAll, onSignup, onLogin } = props;
   const { authMember, authTable } = useGlobals();
   const { setLanguage, t } = useLanguage();
   const productsMatch = useRouteMatch("/products-link");
   const [phase, setPhase] = useState<"language" | "auth" | "products">("language");
+
+  useEffect(() => {
+    setMenuProductsPath("/products-link");
+  }, []);
 
   // When auth completes, go to products
   useEffect(() => {
@@ -94,16 +102,25 @@ export default function ProductsLinkPage(props: ProductsLinkPageProps) {
     );
   }
 
-  // Phase 3: Products (identical to ProductsPage)
+  // Phase 3: Order form + cart + product catalog (same page)
   const basePath = productsMatch?.path ?? "/products-link";
   return (
-    <div className="products-page">
+    <div className="products-page link-order-page-wrap">
+      {authMember && !authTable && (
+        <LinkOrderSection
+          cartItems={cartItems}
+          onAdd={onAdd}
+          onRemove={onRemove}
+          onDelete={onDelete}
+          onDeleteAll={onDeleteAll}
+        />
+      )}
       <Switch>
         <Route path={`${basePath}/:productId`}>
           <ChosenProduct onAdd={onAdd} basePath={basePath} />
         </Route>
         <Route path={basePath}>
-          <Products onAdd={onAdd} basePath={basePath} />
+          <Products onAdd={onAdd} basePath={basePath} compactTop={!!authMember && !authTable} />
         </Route>
       </Switch>
     </div>

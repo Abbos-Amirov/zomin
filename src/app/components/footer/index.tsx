@@ -1,11 +1,15 @@
 import React from "react";
 import { Box, Container, Stack } from "@mui/material";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { useGlobals } from "../../hooks/useGlobals";
 import { RESTAURANT_NAME } from "../../../lib/config";
 import { useLanguage } from "../../context/LanguageContext";
+import {
+  getMenuProductsPath,
+  isMenuProductsActive,
+} from "../../../lib/menuProductsPath";
 import "../../../css/mobile/footer.css";
 
 const Footers = styled.div`
@@ -18,6 +22,8 @@ const Footers = styled.div`
 
 export default function Footer() {
   const { authMember, authTable } = useGlobals();
+  const location = useLocation();
+  const menuProductsPath = getMenuProductsPath(authTable);
   const device = useDeviceDetect();
   const { t } = useLanguage();
 
@@ -38,7 +44,14 @@ export default function Footer() {
           </Box>
 
           <Box className="mobile-footer-links">
-            <NavLink to="/products">{t("menu")}</NavLink>
+            <NavLink
+              to={menuProductsPath}
+              isActive={() =>
+                isMenuProductsActive(location.pathname, menuProductsPath)
+              }
+            >
+              {t("menu")}
+            </NavLink>
             {(authTable || authMember) && <NavLink to="/orders">{t("orders")}</NavLink>}
             <NavLink to="/help">{t("help")}</NavLink>
           </Box>
@@ -115,7 +128,7 @@ export default function Footer() {
                 <Box className={"foot-category-title"}>Sections</Box>
                 <Box className={"foot-category-link"}>
                   <Link to="/">{t("home")}</Link>
-                  <Link to="/products">{t("menu")}</Link>
+                  <Link to={menuProductsPath}>{t("menu")}</Link>
                   {authMember && <Link to="/orders">{t("orders")}</Link>}
                   <Link to="/help">{t("help")}</Link>
                   <Link to="/about">{t("about")}</Link>

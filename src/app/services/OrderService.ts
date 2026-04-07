@@ -2,6 +2,7 @@ import axios from "axios";
 import { serverApi } from "../../lib/config";
 import { CartItem } from "../../lib/types/search";
 import {
+  LinkOrderCreateInput,
   Order,
   OrderInquiry,
   OrderItemInput,
@@ -13,6 +14,19 @@ class OrderService {
 
   constructor() {
     this.path = serverApi;
+  }
+
+  /** Link flow: full customer + table + items (backend: POST /order/link) */
+  public async createLinkOrder(input: LinkOrderCreateInput): Promise<Order> {
+    try {
+      const url = this.path + "/order/link";
+      const result = await axios.post(url, input, { withCredentials: true });
+      console.log("createLinkOrder:", result);
+      return result.data;
+    } catch (err) {
+      console.log("Error. createLinkOrder: ", err);
+      throw err;
+    }
   }
 
   public async createOrder(
