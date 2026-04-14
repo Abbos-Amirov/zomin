@@ -75,7 +75,7 @@ export interface LinkOrderSectionProps {
 
 export default function LinkOrderSection(props: LinkOrderSectionProps) {
   const { cartItems, onAdd, onRemove, onDelete, onDeleteAll } = props;
-  const { authMember } = useGlobals();
+  const { authMember, setOrderBulder } = useGlobals();
   const { t } = useLanguage();
   const history = useHistory();
 
@@ -226,6 +226,7 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
         customerPhone: trimmed.customerPhone,
         arrivalInMinutes: Math.floor(arrivalInMinutes),
         orderItems,
+        memberId: authMember._id,
       };
 
       if (orderType === OrderType.TAKEOUT) {
@@ -241,8 +242,9 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
         });
       }
       onDeleteAll();
+      setOrderBulder(new Date());
       await sweetTopSuccessAlert(t("linkOrderSuccess"), 900);
-      history.push("/orders");
+      history.push("/orders-link");
     } catch (err) {
       console.log(err);
       sweetErrorHandling(err).then();

@@ -2,14 +2,18 @@ import React from "react";
 import { Box, Stack } from "@mui/material";
 import Button from "@mui/material/Button";
 import moment from "moment";
-import { retrievePendingOrders, retrieveProcessOrders } from "./selector";
+import {
+  retrievePausedOrders,
+  retrievePendingOrders,
+  retrieveProcessOrders,
+} from "./selector";
 import { createSelector } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
 import { Order, OrderItem, OrderUpdateInput } from "../../../lib/types/order";
 import { Product } from "../../../lib/types/product";
 import { serverApi, CURRENCY_SYMBOL } from "../../../lib/config";
 import { useGlobals } from "../../hooks/useGlobals";
-import { OrderStatus } from "../../../lib/enums/order.enum";
+import { OrderStatus, PaymentStatus } from "../../../lib/enums/order.enum";
 import OrderService from "../../services/OrderService";
 import { sweetErrorHandling } from "../../../lib/sweetAlert";
 import { T } from "../../../lib/types/common";
@@ -17,10 +21,26 @@ import { Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PhoneIcon from "@mui/icons-material/Phone";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { useLanguage } from "../../context/LanguageContext";
 
-/** REDUX SLICE & SELECTOR */
+/** A'zo (havola oqimi): PAUSE buyurtmalar bitta ro'yxatda */
+function mergeInProgressOrders(
+  mergePaused: boolean,
+  paused: Order[] | undefined,
+  pending: Order[] | undefined,
+  process: Order[] | undefined
+): Order[] {
+  if (!mergePaused) {
+    return [...(pending || []), ...(process || [])];
+  }
+  const m = new Map<string, Order>();
+  for (const o of [...(paused || []), ...(pending || []), ...(process || [])]) {
+    m.set(o._id, o);
+  }
+  return Array.from(m.values());
+}
 
 const pendingOrdersRetriever = createSelector(
   retrievePendingOrders,
@@ -32,19 +52,35 @@ const processOrdersRetriever = createSelector(
   (processOrders) => ({ processOrders })
 );
 
+const pausedOrdersRetriever = createSelector(
+  retrievePausedOrders,
+  (pausedOrders) => ({ pausedOrders })
+);
+
 interface ProcessOrdersProps {
   callHandler: (id: string) => void;
+  /** `/orders-link` — jarayonda asosan bekor, PAUSE ni birlashtirish */
+  linkFlow?: boolean;
+  /** true: PAUSE + PENDING + PROCESS bitta ro'yxatda */
+  mergePausedIntoProgress?: boolean;
 }
 
 export default function ProcessOrders(props: ProcessOrdersProps) {
-  const { callHandler } = props;
-  const { setOrderBulder, authTable } = useGlobals();
+  const { callHandler, linkFlow = false, mergePausedIntoProgress = false } = props;
+  const { setOrderBulder, authTable, authMember } = useGlobals();
   const { t } = useLanguage();
   const { processOrders } = useSelector(processOrdersRetriever);
   const { pendingOrders } = useSelector(pendingOrdersRetriever);
+  const { pausedOrders } = useSelector(pausedOrdersRetriever);
   const device = useDeviceDetect();
 
-  /** HANDLERS **/
+  const allOrders = mergeInProgressOrders(
+    mergePausedIntoProgress,
+    pausedOrders,
+    pendingOrders,
+    processOrders
+  );
+
   const deleteOrderHandler = async (e: T) => {
     try {
       const orderId = e.target.value;
@@ -53,7 +89,34 @@ export default function ProcessOrders(props: ProcessOrdersProps) {
         orderStatus: OrderStatus.CANCELLED,
       };
 
-      const confirmation = window.confirm("Do you want to delete the order?");
+      const confirmation = window.confirm(
+        linkFlow ? t("linkCancelOrderConfirm") : "Do you want to delete the order?"
+      );
+      if (confirmation) {
+        const order = new OrderService();
+        await order.updateOrder(input);
+        setOrderBulder(new Date());
+      }
+    } catch (err) {
+      console.log(err);
+      sweetErrorHandling(err).then();
+    }
+  };
+
+  const processOrderHandler = async (e: T) => {
+    try {
+      const orderId = e.target.value;
+      const input: OrderUpdateInput = {
+        orderId: orderId,
+        orderStatus: OrderStatus.PENDING,
+      };
+      if (authMember) input.paymentStatus = PaymentStatus.PAID;
+
+      const confirmation = window.confirm(
+        authMember
+          ? "Do you want to proceed with payment?"
+          : "Do you want to order?"
+      );
       if (confirmation) {
         const order = new OrderService();
         await order.updateOrder(input);
@@ -84,15 +147,86 @@ export default function ProcessOrders(props: ProcessOrdersProps) {
       sweetErrorHandling(err).then();
     }
   };
+
+  const renderMobileActions = (order: Order) => {
+    if (linkFlow && order.orderStatus !== OrderStatus.PAUSE) {
+      return (
+        <Box className="mobile-order-actions">
+          <Button
+            value={order._id}
+            variant="outlined"
+            className="mobile-order-cancel-btn"
+            fullWidth
+            startIcon={<DeleteIcon />}
+            onClick={deleteOrderHandler}
+          >
+            {t("cancel")}
+          </Button>
+        </Box>
+      );
+    }
+    if (order.orderStatus === OrderStatus.PAUSE) {
+      return (
+        <Box className="mobile-order-actions">
+          <Button
+            value={order._id}
+            variant="outlined"
+            className="mobile-order-cancel-btn"
+            startIcon={<DeleteIcon />}
+            onClick={deleteOrderHandler}
+          >
+            {t("cancel")}
+          </Button>
+          <Button
+            value={order._id}
+            variant="contained"
+            className="mobile-order-process-btn"
+            startIcon={<ShoppingCartIcon />}
+            onClick={processOrderHandler}
+          >
+            {authMember ? t("payment") : t("order")}
+          </Button>
+        </Box>
+      );
+    }
+    return (
+      <Box className="mobile-order-actions">
+        <Button
+          value={order._id}
+          variant="outlined"
+          className="mobile-order-cancel-btn"
+          startIcon={<DeleteIcon />}
+          onClick={deleteOrderHandler}
+          disabled={order.orderStatus !== OrderStatus.PENDING}
+        >
+          {t("cancel")}
+        </Button>
+        <Button
+          value={order._id}
+          variant="contained"
+          className="mobile-order-process-btn"
+          startIcon={authTable ? <PhoneIcon /> : <CheckCircleIcon />}
+          onClick={(e) => {
+            if (authTable) {
+              callHandler(authTable._id);
+            } else {
+              finishOrderHandler(e);
+            }
+          }}
+        >
+          {authTable ? t("call") : t("verify")}
+        </Button>
+      </Box>
+    );
+  };
+
   if (device === "mobile") {
-    const allOrders = pendingOrders?.concat(processOrders) || [];
     return (
       <Box>
         <Box className="mobile-orders-list">
           {allOrders.length > 0 ? (
             allOrders.map((order: Order) => (
               <Box key={order._id} className="mobile-order-card mobile-order-processing">
-                {/* Order Items */}
                 <Box className="mobile-order-items">
                   {order.orderItems?.map((item: OrderItem) => {
                     const product: Product = order.productData.filter(
@@ -124,7 +258,6 @@ export default function ProcessOrders(props: ProcessOrdersProps) {
                   })}
                 </Box>
 
-                {/* Order Summary */}
                 <Box className="mobile-order-summary">
                   <Box className="mobile-order-summary-row">
                     <Typography>Product price</Typography>
@@ -143,34 +276,7 @@ export default function ProcessOrders(props: ProcessOrdersProps) {
                   </Typography>
                 </Box>
 
-                {/* Action Buttons */}
-                <Box className="mobile-order-actions">
-                  <Button
-                    value={order._id}
-                    variant="outlined"
-                    className="mobile-order-cancel-btn"
-                    startIcon={<DeleteIcon />}
-                    onClick={deleteOrderHandler}
-                    disabled={order.orderStatus !== OrderStatus.PENDING}
-                  >
-                    {t("cancel")}
-                  </Button>
-                  <Button
-                    value={order._id}
-                    variant="contained"
-                    className="mobile-order-process-btn"
-                    startIcon={authTable ? <PhoneIcon /> : <CheckCircleIcon />}
-                    onClick={(e) => {
-                      if (authTable) {
-                        callHandler(authTable._id);
-                      } else {
-                        finishOrderHandler(e);
-                      }
-                    }}
-                  >
-                    {authTable ? t("call") : t("verify")}
-                  </Button>
-                </Box>
+                {renderMobileActions(order)}
               </Box>
             ))
           ) : (
@@ -187,75 +293,105 @@ export default function ProcessOrders(props: ProcessOrdersProps) {
   return (
     <Box>
       <Stack>
-        {pendingOrders?.concat(processOrders).map((order: Order) => {
-          return (
-            <Box key={order._id} className="order-main-box">
-              <Box className="order-box-scroll">
-                {order.orderItems?.map((item: OrderItem) => {
-                  const product: Product = order.productData.filter(
-                    (ele: Product) => item.productId === ele._id
-                  )[0];
-                  const imagePath = `${serverApi}/${product.productImages[0]}`;
-                  return (
-                    <Box key={item._id} className="orders-name-price">
-                      <img src={imagePath} className="order-dish-img" />
-                      <p className="title-dish">{product.productName}</p>
-                      <Box className="price-box">
-                        <p>{CURRENCY_SYMBOL}{item.itemPrice}</p>
-                        <img src="/icons/close.svg" />
-                        <p>{item.itemQuantity}</p>
-                        <img src="/icons/pause.svg" />
-                        <p>{CURRENCY_SYMBOL}{item.itemQuantity * item.itemPrice}</p>
-                      </Box>
+        {allOrders.map((order: Order) => (
+          <Box key={order._id} className="order-main-box">
+            <Box className="order-box-scroll">
+              {order.orderItems?.map((item: OrderItem) => {
+                const product: Product = order.productData.filter(
+                  (ele: Product) => item.productId === ele._id
+                )[0];
+                const imagePath = `${serverApi}/${product.productImages[0]}`;
+                return (
+                  <Box key={item._id} className="orders-name-price">
+                    <img src={imagePath} className="order-dish-img" alt="" />
+                    <p className="title-dish">{product.productName}</p>
+                    <Box className="price-box">
+                      <p>{CURRENCY_SYMBOL}{item.itemPrice}</p>
+                      <img src={"/icons/close.svg"} alt="" />
+                      <p>{item.itemQuantity}</p>
+                      <img src="/icons/pause.svg" alt="" />
+                      <p>{CURRENCY_SYMBOL}{item.itemQuantity * item.itemPrice}</p>
                     </Box>
-                  );
-                })}
-                <Box className="total-price-box">
-                  <Box className="box-total">
-                    <p>Product price</p>
-                    <p>{CURRENCY_SYMBOL}{order.orderTotal - order.orderDelivery}</p>
-                    <img src={"/icons/plus.svg"} />
-                    <p>delivery cost</p>
-                    <p>{CURRENCY_SYMBOL}{order.orderDelivery}</p>
-                    <img src={"/icons/pause.svg"} />
-                    <p>Total</p>
-                    <p>{CURRENCY_SYMBOL}{order.orderTotal}</p>
                   </Box>
-                  <p className="data-compl">
-                    {moment().format("YY-MM-DD HH:mm")}
-                  </p>
+                );
+              })}
+              <Box className="total-price-box">
+                <Box className="box-total">
+                  <p>Product price</p>
+                  <p>{CURRENCY_SYMBOL}{order.orderTotal - order.orderDelivery}</p>
+                  <img src={"/icons/plus.svg"} alt="" />
+                  <p>delivery cost</p>
+                  <p>{CURRENCY_SYMBOL}{order.orderDelivery}</p>
+                  <img src="/icons/pause.svg" alt="" />
+                  <p>Total</p>
+                  <p>{CURRENCY_SYMBOL}{order.orderTotal}</p>
+                </Box>
+                <p className="data-compl">{moment().format("YY-MM-DD HH:mm")}</p>
 
+                {linkFlow && order.orderStatus !== OrderStatus.PAUSE ? (
                   <Button
                     value={order._id}
                     variant="contained"
                     className="cancel-button"
-                    color={"secondary"}
+                    color="secondary"
                     onClick={deleteOrderHandler}
-                    disabled={order.orderStatus !== OrderStatus.PENDING}
                   >
                     {t("cancel")}
                   </Button>
-                  <Button
-                    value={order._id}
-                    variant="contained"
-                    className="verify-button"
-                    onClick={(e) => {
-                      if (authTable) {
-                        callHandler(authTable._id);
-                      } else {
-                        finishOrderHandler(e);
-                      }
-                    }}
-                  >
-                    {authTable ? t("call") : t("verify")}
-                  </Button>
-                </Box>
+                ) : order.orderStatus === OrderStatus.PAUSE ? (
+                  <>
+                    <Button
+                      value={order._id}
+                      variant="contained"
+                      className="cancel-button"
+                      color="secondary"
+                      onClick={deleteOrderHandler}
+                    >
+                      {t("cancel")}
+                    </Button>
+                    <Button
+                      value={order._id}
+                      variant="contained"
+                      className="verify-button"
+                      onClick={processOrderHandler}
+                    >
+                      {authMember ? t("payment") : t("order")}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      value={order._id}
+                      variant="contained"
+                      className="cancel-button"
+                      color="secondary"
+                      onClick={deleteOrderHandler}
+                      disabled={order.orderStatus !== OrderStatus.PENDING}
+                    >
+                      {t("cancel")}
+                    </Button>
+                    <Button
+                      value={order._id}
+                      variant="contained"
+                      className="verify-button"
+                      onClick={(e) => {
+                        if (authTable) {
+                          callHandler(authTable._id);
+                        } else {
+                          finishOrderHandler(e);
+                        }
+                      }}
+                    >
+                      {authTable ? t("call") : t("verify")}
+                    </Button>
+                  </>
+                )}
               </Box>
             </Box>
-          );
-        })}
+          </Box>
+        ))}
 
-        {pendingOrders?.concat(processOrders)?.length === 0 && (
+        {allOrders.length === 0 && (
           <Box
             width={"800px"}
             display="flex"
@@ -265,6 +401,7 @@ export default function ProcessOrders(props: ProcessOrdersProps) {
             <img
               src={"/icons/noimage-list.svg"}
               style={{ width: 400, height: 400 }}
+              alt=""
             />
           </Box>
         )}

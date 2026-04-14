@@ -13,6 +13,14 @@ export const tableApiBase: string =
 /** Optional default for link-order flow; can still be edited in the form */
 export const DEFAULT_RESTAURANT_ID: string = process.env.REACT_APP_RESTAURANT_ID || "";
 
+/**
+ * Backend: GET `{serverApi}/orders/all-member?memberId=...&page=&limit=`
+ * — `/orders-link` sahifasidagi barcha buyurtmalar shu endpointdan.
+ */
+export const ORDERS_ALL_MEMBER_PATH =
+  (process.env.REACT_APP_ORDERS_ALL_MEMBER_PATH && process.env.REACT_APP_ORDERS_ALL_MEMBER_PATH.trim()) ||
+  "/orders/all-member";
+
 export const RESTAURANT_NAME = "Zomin";
 
 export const CURRENCY_SYMBOL = "₩"; // Won

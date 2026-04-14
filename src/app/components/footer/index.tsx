@@ -8,6 +8,7 @@ import { RESTAURANT_NAME } from "../../../lib/config";
 import { useLanguage } from "../../context/LanguageContext";
 import {
   getMenuProductsPath,
+  getOrdersPath,
   isMenuProductsActive,
 } from "../../../lib/menuProductsPath";
 import "../../../css/mobile/footer.css";
@@ -24,6 +25,7 @@ export default function Footer() {
   const { authMember, authTable } = useGlobals();
   const location = useLocation();
   const menuProductsPath = getMenuProductsPath(authTable);
+  const ordersPath = getOrdersPath(authTable, authMember);
   const device = useDeviceDetect();
   const { t } = useLanguage();
 
@@ -129,7 +131,7 @@ export default function Footer() {
                 <Box className={"foot-category-link"}>
                   <Link to="/">{t("home")}</Link>
                   <Link to={menuProductsPath}>{t("menu")}</Link>
-                  {authMember && <Link to="/orders">{t("orders")}</Link>}
+                  {authMember && <Link to={ordersPath}>{t("orders")}</Link>}
                   <Link to="/help">{t("help")}</Link>
                   <Link to="/about">{t("about")}</Link>
                 </Box>

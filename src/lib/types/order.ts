@@ -67,6 +67,8 @@ export interface LinkOrderCreateInput {
   customerPhone: string;
   arrivalInMinutes: number;
   orderItems: LinkOrderItemInput[];
+  /** A'zo sessiyasi — GET /order/all da shu buyurtmalar ko'rinishi uchun */
+  memberId?: string;
   /** Defaults to TABLE on backend if omitted */
   orderType?: OrderType;
 }
@@ -78,6 +80,7 @@ export interface LinkTakeoutOrderCreateInput {
   customerPhone: string;
   arrivalInMinutes: number;
   orderItems: LinkOrderItemInput[];
+  memberId?: string;
   orderType?: OrderType;
 }
 

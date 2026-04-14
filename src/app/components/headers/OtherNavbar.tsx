@@ -18,6 +18,7 @@ import { RESTAURANT_NAME } from "../../../lib/config";
 import { useLanguage } from "../../context/LanguageContext";
 import {
   getMenuProductsPath,
+  getOrdersPath,
   isMenuProductsActive,
 } from "../../../lib/menuProductsPath";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -60,6 +61,7 @@ export default function OtherNavbar(props: OtherNavbarProps) {
   const { authMember, authTable } = useGlobals();
   const location = useLocation();
   const menuProductsPath = getMenuProductsPath(authTable);
+  const ordersPath = getOrdersPath(authTable, authMember);
   const device = useDeviceDetect();
   const { t } = useLanguage();
 
@@ -93,9 +95,9 @@ export default function OtherNavbar(props: OtherNavbarProps) {
                   {t("help")}
                 </NavLink>
               </Box>
-              {authTable && (
+              {(authTable || (authMember && !authTable)) && (
                 <Box className={"hover-line"}>
-                  <NavLink to="/orders" activeClassName="underline">
+                  <NavLink to={ordersPath} activeClassName="underline">
                     {t("orders")}
                   </NavLink>
                 </Box>
@@ -145,7 +147,7 @@ export default function OtherNavbar(props: OtherNavbarProps) {
               </Box>
               {authMember || authTable ? (
                 <Box className={"hover-line"}>
-                  <NavLink to="/orders" activeClassName="underline">
+                  <NavLink to={ordersPath} activeClassName="underline">
                     {t("orders")}
                   </NavLink>
                 </Box>

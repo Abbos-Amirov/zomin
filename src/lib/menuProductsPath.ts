@@ -30,6 +30,23 @@ export function getMenuProductsPath(authTable: Table | null | undefined): MenuPr
   return "/products-link";
 }
 
+/** Havola (`/products-link`) orqali kirgan a'zo — QR stol emas */
+export function isLinkFlowCustomer(
+  authTable: Table | null | undefined,
+  authMember: unknown
+): boolean {
+  if (!authMember || authTable != null) return false;
+  return getMenuProductsPath(null) === "/products-link";
+}
+
+/** Buyurtmalar sahifasi: havola a'zolari `/orders-link`, QR stol — `/orders` */
+export function getOrdersPath(
+  authTable: Table | null | undefined,
+  authMember: unknown
+): "/orders" | "/orders-link" {
+  return isLinkFlowCustomer(authTable, authMember) ? "/orders-link" : "/orders";
+}
+
 /** `/products-link` `/products` bilan boshlanmasin — faqat `/products/...` */
 export function isMenuProductsActive(
   pathname: string,

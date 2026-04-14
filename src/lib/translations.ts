@@ -114,6 +114,7 @@ export const translations: Record<Language, Record<string, string>> = {
     linkFillAllFields: "Barcha maydonlarni to'ldiring",
     linkCartRequired: "Kamida bitta taom tanlang",
     linkOrderSuccess: "Buyurtma qabul qilindi",
+    linkCancelOrderConfirm: "Buyurtmani bekor qilasizmi?",
     linkTotal: "Jami",
   },
   ko: {
@@ -229,6 +230,7 @@ export const translations: Record<Language, Record<string, string>> = {
     linkFillAllFields: "모든 항목을 입력하세요",
     linkCartRequired: "메뉴를 하나 이상 담으세요",
     linkOrderSuccess: "주문이 접수되었습니다",
+    linkCancelOrderConfirm: "주문을 취소하시겠습니까?",
     linkTotal: "합계",
   },
   en: {
@@ -344,6 +346,7 @@ export const translations: Record<Language, Record<string, string>> = {
     linkFillAllFields: "Please fill in all fields",
     linkCartRequired: "Add at least one dish",
     linkOrderSuccess: "Order placed",
+    linkCancelOrderConfirm: "Cancel this order?",
     linkTotal: "Total",
   },
   ru: {
@@ -459,6 +462,7 @@ export const translations: Record<Language, Record<string, string>> = {
     linkFillAllFields: "Заполните все поля",
     linkCartRequired: "Добавьте хотя бы одно блюдо",
     linkOrderSuccess: "Заказ принят",
+    linkCancelOrderConfirm: "Отменить заказ?",
     linkTotal: "Итого",
   },
 };

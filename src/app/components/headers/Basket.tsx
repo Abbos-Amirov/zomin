@@ -12,6 +12,7 @@ import { CartItem } from "../../../lib/types/search";
 import { serverApi, CURRENCY_SYMBOL } from "../../../lib/config";
 import { sweetErrorHandling } from "../../../lib/sweetAlert";
 import { useGlobals } from "../../hooks/useGlobals";
+import { getOrdersPath } from "../../../lib/menuProductsPath";
 import OrderService from "../../services/OrderService";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { useLanguage } from "../../context/LanguageContext";
@@ -78,7 +79,7 @@ export default function Basket(props: BasketProps) {
       onDeleteAll();
 
       setOrderBulder(new Date());
-      history.push("/orders");
+      history.push(getOrdersPath(authTable, authMember));
     } catch (err) {
       console.log(err);
       sweetErrorHandling(err).then();

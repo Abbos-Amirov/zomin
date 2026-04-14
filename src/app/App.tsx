@@ -21,6 +21,8 @@ import TableService from "./services/TableService";
 import CallButton from "./components/callWaiter";
 import { AddToCartAnimationProvider } from "./context/AddToCartAnimation";
 import ProductsLinkPage from "./screens/productsLinkPage";
+import OrdersLinkPage from "./screens/ordersLinkPage";
+import { isLinkFlowCustomer } from "../lib/menuProductsPath";
 
 export default function App() {
   const location = useLocation();
@@ -126,9 +128,18 @@ export default function App() {
             <ProductsPage onAdd={onAdd} />
           )}
         </Route>
+        <Route path="/orders-link">
+          {needsAuth ? (
+            <Redirect to="/products-link" />
+          ) : (
+            <OrdersLinkPage callHandler={callHandler} />
+          )}
+        </Route>
         <Route path="/orders">
           {needsAuth ? (
             <Redirect to="/products-link" />
+          ) : isLinkFlowCustomer(authTable, authMember) ? (
+            <Redirect to="/orders-link" />
           ) : (
             <OrdersPage callHandler={callHandler} />
           )}

@@ -1,6 +1,7 @@
 import axios from "axios";
-import { serverApi } from "../../lib/config";
+import { ORDERS_ALL_MEMBER_PATH, serverApi } from "../../lib/config";
 import { CartItem } from "../../lib/types/search";
+import { OrderStatus } from "../../lib/enums/order.enum";
 import {
   LinkOrderCreateInput,
   LinkTakeoutOrderCreateInput,
@@ -9,6 +10,122 @@ import {
   OrderItemInput,
   OrderUpdateInput,
 } from "../../lib/types/order";
+
+/** Backend Mongo/paginate: `docs`, Postman: `orderList` va hokazo */
+const ORDER_LIST_ROOT_KEYS = [
+  "orders",
+  "orderList",
+  "ordersList",
+  "list",
+  "data",
+  "items",
+  "result",
+  "records",
+  "rows",
+  "payload",
+  "docs",
+  "content",
+  "value",
+  "body",
+];
+
+function isOrderLikeRow(item: unknown): boolean {
+  if (!item || typeof item !== "object") return false;
+  const o = item as Record<string, unknown>;
+  if (typeof o._id !== "string") return false;
+  return (
+    o.orderStatus != null ||
+    Array.isArray(o.orderItems) ||
+    typeof o.orderTotal === "number" ||
+    o.memberId != null ||
+    o.tableId != null ||
+    o.customerName != null
+  );
+}
+
+function findFirstOrderArrayDeep(data: unknown, depth: number): Order[] {
+  if (depth > 16) return [];
+  if (Array.isArray(data)) {
+    const orders = data.filter(isOrderLikeRow) as Order[];
+    if (orders.length > 0) return orders;
+    for (const el of data) {
+      const inner = findFirstOrderArrayDeep(el, depth + 1);
+      if (inner.length > 0) return inner;
+    }
+    return [];
+  }
+  if (data && typeof data === "object") {
+    for (const v of Object.values(data as Record<string, unknown>)) {
+      const inner = findFirstOrderArrayDeep(v, depth + 1);
+      if (inner.length > 0) return inner;
+    }
+  }
+  return [];
+}
+
+/** GET /order/all, GET /orders/all-member — massiv yoki keng tarqalgan wrapperlar */
+function extractOrderListFromResponse(data: unknown): Order[] {
+  if (Array.isArray(data)) {
+    if (data.length === 0) return [];
+    if (isOrderLikeRow(data[0])) return data as Order[];
+    const deep = findFirstOrderArrayDeep(data, 0);
+    if (deep.length > 0) return deep;
+    if (
+      data.every(
+        (x) =>
+          x &&
+          typeof x === "object" &&
+          typeof (x as Record<string, unknown>)._id === "string"
+      )
+    ) {
+      return data as Order[];
+    }
+    return [];
+  }
+  if (!data || typeof data !== "object") {
+    return [];
+  }
+  const root = data as Record<string, unknown>;
+  for (const k of ORDER_LIST_ROOT_KEYS) {
+    const v = root[k];
+    if (Array.isArray(v)) {
+      if (v.length === 0) continue;
+      if (isOrderLikeRow(v[0])) return v as Order[];
+      const inner = extractOrderListFromResponse(v);
+      if (inner.length > 0) return inner;
+    }
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      const inner = extractOrderListFromResponse(v);
+      if (inner.length > 0) return inner;
+    }
+  }
+  return findFirstOrderArrayDeep(data, 0);
+}
+
+/** GET /orders/all-member javobidan bitta a'zoning barcha buyurtmalari */
+function partitionOrdersByMemberList(all: Order[]): {
+  paused: Order[];
+  pending: Order[];
+  process: Order[];
+  finished: Order[];
+} {
+  const paused: Order[] = [];
+  const pending: Order[] = [];
+  const process: Order[] = [];
+  const finished: Order[] = [];
+  for (const o of all) {
+    const raw = o.orderStatus;
+    const s =
+      typeof raw === "string" ? (raw.trim().toUpperCase() as OrderStatus) : raw;
+    if (s === OrderStatus.PAUSE) paused.push(o);
+    else if (s === OrderStatus.PENDING) pending.push(o);
+    else if (s === OrderStatus.PROCESS) process.push(o);
+    else if (s === OrderStatus.COMPLETED || s === OrderStatus.SERVED) finished.push(o);
+    else if (s === OrderStatus.CANCELLED) finished.push(o);
+    else process.push(o);
+  }
+  return { paused, pending, process, finished };
+}
 
 class OrderService {
   private readonly path: string;
@@ -72,6 +189,45 @@ class OrderService {
     }
   }
 
+  /**
+   * GET `{serverApi}{ORDERS_ALL_MEMBER_PATH}` — bitta a'zoning barcha buyurtmalari.
+   */
+  public async getOrdersByMemberId(
+    memberId: string,
+    options?: { page?: number; limit?: number }
+  ): Promise<Order[]> {
+    try {
+      const page = options?.page ?? 1;
+      const limit = options?.limit ?? 200;
+      const url = `${this.path}${ORDERS_ALL_MEMBER_PATH}?memberId=${encodeURIComponent(
+        memberId
+      )}&page=${page}&limit=${limit}`;
+      const result = await axios.get(url, { withCredentials: true });
+      const list = extractOrderListFromResponse(result.data);
+      if (list.length === 0 && result.data != null && typeof result.data === "object") {
+        console.warn(
+          `[OrderService] GET ${ORDERS_ALL_MEMBER_PATH}: bo'sh yoki notanish javob. kalitlar:`,
+          Object.keys(result.data as object)
+        );
+      }
+      return list;
+    } catch (err) {
+      console.log("Error. getOrdersByMemberId: ", err);
+      throw err;
+    }
+  }
+
+  /** Havola /orders-link: bitta so'rov, keyin status bo'yicha bo'linadi */
+  public async getMemberOrdersPartitioned(memberId: string): Promise<{
+    paused: Order[];
+    pending: Order[];
+    process: Order[];
+    finished: Order[];
+  }> {
+    const all = await this.getOrdersByMemberId(memberId, { page: 1, limit: 500 });
+    return partitionOrdersByMemberList(all);
+  }
+
   public async getMyOrders(input: OrderInquiry): Promise<Order[]> {
     try {
       const url = `${this.path}/order/all`;
@@ -80,7 +236,14 @@ class OrderService {
       const result = await axios.get(url + query, { withCredentials: true });
       console.log("getMyOrders: ", result);
 
-      return result.data;
+      const list = extractOrderListFromResponse(result.data);
+      if (list.length === 0 && result.data != null && typeof result.data === "object") {
+        console.warn(
+          "[OrderService] GET /order/all: topilmadi yoki bo'sh. response kalitlari:",
+          Object.keys(result.data as object)
+        );
+      }
+      return list;
     } catch (err) {
       console.log("Error. getMyOrders: ", err);
       throw err;

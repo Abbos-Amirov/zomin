@@ -13,6 +13,7 @@ import OrderService from "../../services/OrderService";
 import { sweetErrorHandling } from "../../../lib/sweetAlert";
 import { Typography } from "@mui/material";
 import PaymentIcon from "@mui/icons-material/Payment";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { useLanguage } from "../../context/LanguageContext";
 
@@ -23,7 +24,13 @@ const finishedOrdersRetriever = createSelector(
   (finishedOrders) => ({ finishedOrders })
 );
 
-export default function FinishedOrders() {
+interface FinishedOrdersProps {
+  /** Havola orqali kirganlar — to'lov o'rniga bekor qilish */
+  linkFlow?: boolean;
+}
+
+export default function FinishedOrders(props: FinishedOrdersProps) {
+  const { linkFlow = false } = props;
   const { finishedOrders } = useSelector(finishedOrdersRetriever);
   const { setOrderBulder } = useGlobals();
   const device = useDeviceDetect();
@@ -52,6 +59,24 @@ export default function FinishedOrders() {
       sweetErrorHandling(err).then();
     }
   };
+
+  const cancelOrderHandler = async (e: T) => {
+    try {
+      const orderId = e.target.value;
+      const input: OrderUpdateInput = {
+        orderId,
+        orderStatus: OrderStatus.CANCELLED,
+      };
+      if (!window.confirm(t("linkCancelOrderConfirm"))) return;
+      const order = new OrderService();
+      await order.updateOrder(input);
+      setOrderBulder(new Date());
+    } catch (err) {
+      console.log(err);
+      sweetErrorHandling(err).then();
+    }
+  };
+
   if (device === "mobile") {
     return (
       <Box>
@@ -107,8 +132,21 @@ export default function FinishedOrders() {
                   </Box>
                 </Box>
 
-                {/* Payment Button */}
+                {/* Payment / cancel (link flow) */}
                 <Box className="mobile-order-actions">
+                  {linkFlow ? (
+                    <Button
+                      value={order._id}
+                      variant="outlined"
+                      color="error"
+                      className="mobile-order-cancel-btn"
+                      startIcon={<DeleteOutlineIcon />}
+                      onClick={cancelOrderHandler}
+                      fullWidth
+                    >
+                      {t("cancel")}
+                    </Button>
+                  ) : (
                     <Button
                       value={order._id}
                       variant="contained"
@@ -119,7 +157,8 @@ export default function FinishedOrders() {
                     >
                       {t("payment")}
                     </Button>
-                  </Box>
+                  )}
+                </Box>
               </Box>
             ))
           ) : (
@@ -169,7 +208,18 @@ export default function FinishedOrders() {
                     <img src={"/icons/pause.svg"} />
                     <p>Total</p>
                     <p>{CURRENCY_SYMBOL}{order.orderTotal}</p>
-                    <Button
+                    {linkFlow ? (
+                      <Button
+                        value={order._id}
+                        variant="contained"
+                        className="cancel-button"
+                        color="secondary"
+                        onClick={cancelOrderHandler}
+                      >
+                        {t("cancel")}
+                      </Button>
+                    ) : (
+                      <Button
                         value={order._id}
                         variant="contained"
                         className="verify-button"
@@ -177,6 +227,7 @@ export default function FinishedOrders() {
                       >
                         {t("payment")}
                       </Button>
+                    )}
                   </Box>
                 </Box>
               </Box>
@@ -184,20 +235,19 @@ export default function FinishedOrders() {
           );
         })}
 
-        {!finishedOrders ||
-          (finishedOrders.length === 0 && (
-            <Box
-              width={"800px"}
-              display="flex"
-              flexDirection="row"
-              justifyContent="center"
-            >
-              <img
-                src={"/icons/noimage-list.svg"}
-                style={{ width: 400, height: 400 }}
-              />
-            </Box>
-          ))}
+        {(!finishedOrders || finishedOrders.length === 0) && (
+          <Box
+            width={"800px"}
+            display="flex"
+            flexDirection="row"
+            justifyContent="center"
+          >
+            <img
+              src={"/icons/noimage-list.svg"}
+              style={{ width: 400, height: 400 }}
+            />
+          </Box>
+        )}
       </Stack>
     </Box>
   );
