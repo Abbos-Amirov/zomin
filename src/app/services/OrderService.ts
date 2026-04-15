@@ -138,7 +138,11 @@ class OrderService {
     this.path = serverApi;
   }
 
-  /** Link flow: full customer + table + items (backend: POST /order/link) */
+  /**
+   * POST /order/link — withCredentials: cookie (accessToken).
+   * Login qilgan a’zo: memberId/cookie. Login bo‘lmagan havola mijozi: backend `customerPhone`
+   * ni boshqa faol buyurtmalar bilan solishtiradi (viewer null).
+   */
   public async createLinkOrder(input: LinkOrderCreateInput): Promise<Order> {
     try {
       const url = this.path + "/order/link";
@@ -151,7 +155,7 @@ class OrderService {
     }
   }
 
-  /** Link flow: olib ketish — stolsiz (backend: POST /order/link-takeout) */
+  /** POST /order/link-takeout — withCredentials xuddi /order/link kabi */
   public async createLinkTakeoutOrder(input: LinkTakeoutOrderCreateInput): Promise<Order> {
     try {
       const url = this.path + "/order/link-takeout";

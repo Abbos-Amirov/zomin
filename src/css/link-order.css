@@ -142,6 +142,25 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+/* Sizning stolingiz — qayta buyurtma (backend occupiedByMe) */
+.link-table-card--mine.link-table-card--occupied {
+  opacity: 1;
+  border-style: solid;
+  border-color: rgba(55, 118, 204, 0.45);
+  box-shadow: 0 0 0 1px rgba(55, 118, 204, 0.2);
+  cursor: pointer;
+}
+
+.link-table-card--mine.link-table-card--occupied:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(55, 118, 204, 0.18);
+}
+
+.link-table-card-yours {
+  font-size: 0.7rem !important;
+  max-width: 100%;
+}
+
 /* Stol kartochkalari — grid */
 .link-table-cards-grid {
   display: grid;

@@ -92,7 +92,10 @@ class TableService {
     this.path = serverApi;
   }
 
-  /** All tables for link-order picker (GET {tableApiBase}/table/all) */
+  /**
+   * GET {tableApiBase}/table/all — withCredentials: cookie (accessToken).
+   * Backend: occupiedByMe va h.k. Bearer + cookie bilan ishlaydi.
+   */
   public async getAllTables(): Promise<Table[]> {
     try {
       const url = tableApiBase + "/table/all";
@@ -130,7 +133,22 @@ class TableService {
         ? (rawKind as TableKind)
         : base.tableKind;
     const tableKindDisplay = rawKind ?? base.tableKindDisplay;
-    return { ...base, tableNumber, tableType, tableKind, tableKindDisplay };
+    const occupiedByMe = Boolean(row.occupiedByMe ?? row.occupied_by_me);
+    const selectableByCurrentMember = Boolean(
+      row.selectableByCurrentMember ??
+        row.selectable_for_current_member ??
+        row.canSelectForReorder ??
+        row.can_select_for_reorder
+    );
+    return {
+      ...base,
+      tableNumber,
+      tableType,
+      tableKind,
+      tableKindDisplay,
+      occupiedByMe,
+      selectableByCurrentMember,
+    };
   }
 
   /** Backend `tableKind` / `kind` / `table_kind` / raqam — bittasini ham olish */

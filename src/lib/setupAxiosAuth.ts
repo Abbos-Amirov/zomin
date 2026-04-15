@@ -1,17 +1,24 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { serverApi } from "./config";
+import { serverApi, tableApiBase } from "./config";
 import { getStoredAccessToken } from "./accessToken";
 
 let attached = false;
 
-/** Attaches Bearer token to requests targeting this app's API (same origin as serverApi). */
+function isAppApiUrl(url: string): boolean {
+  return url.startsWith(serverApi) || url.startsWith(tableApiBase);
+}
+
+/**
+ * Bearer token (localStorage accessToken) + withCredentials (cookie) —
+ * GET /table/all, POST /order/link va boshqalar uchun backend `occupiedByMe` / member tekshiruvlari bilan uyg‘un.
+ */
 export function setupAxiosAuth(): void {
   if (attached) return;
   attached = true;
 
   axios.interceptors.request.use((config: AxiosRequestConfig) => {
     const url = config.url ?? "";
-    if (!url.startsWith(serverApi)) {
+    if (!isAppApiUrl(url)) {
       return config;
     }
     const token = getStoredAccessToken();

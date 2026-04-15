@@ -11,6 +11,10 @@ export interface Table {
   tableKindDisplay?: string;
   qrToken: string;
   tableStatus: TableStatus;
+  /** GET /table/all — joriy a'zo ushbu stolni qayta tanlashi mumkin (backend) */
+  occupiedByMe?: boolean;
+  /** Ba'zi backendlar — band stolni tanlashga ruxsat */
+  selectableByCurrentMember?: boolean;
   tableCall: TableCall;
   activeIdentifier: string;
   createdAt: Date;

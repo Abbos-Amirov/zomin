@@ -65,6 +65,17 @@ function tableKindLabel(table: Table, t: (key: string) => string): string | null
   return table.tableKindDisplay ?? null;
 }
 
+/**
+ * Band stolni faqat backend `occupiedByMe` / `selectableByCurrentMember` true qilganda tanlash mumkin.
+ * Bu maydonlar bo‘lmasa, xuddi avvalgidek barcha OCCUPIED bloklanadi.
+ */
+function canSelectTableForLinkOrder(table: Table): boolean {
+  if (table.tableStatus === TableStatus.OCCUPIED) {
+    return Boolean(table.occupiedByMe || table.selectableByCurrentMember);
+  }
+  return true;
+}
+
 export interface LinkOrderSectionProps {
   cartItems: CartItem[];
   onAdd: (item: CartItem) => void;
@@ -141,7 +152,7 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
       return;
     }
     if (tables.length === 0) return;
-    const hasAvailable = tables.some((tb) => tb.tableStatus === TableStatus.AVAILABLE);
+    const hasAvailable = tables.some((tb) => canSelectTableForLinkOrder(tb));
     setQueueTicket((prev) => {
       if (hasAvailable) return null;
       if (prev !== null) return prev;
@@ -167,7 +178,7 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
   };
 
   const selectTableRow = (table: Table) => {
-    if (table.tableStatus === TableStatus.OCCUPIED) {
+    if (!canSelectTableForLinkOrder(table)) {
       sweetErrorHandling(new Error(t("linkTableOccupiedMsg"))).then();
       return;
     }
@@ -177,7 +188,7 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
   };
 
   const hasAvailableTable =
-    tables.length > 0 && tables.some((tb) => tb.tableStatus === TableStatus.AVAILABLE);
+    tables.length > 0 && tables.some((tb) => canSelectTableForLinkOrder(tb));
   const showAllBusyBanner = tableDialogOpen && tables.length > 0 && !hasAvailableTable && !tablesLoading;
 
   const itemsPrice = cartItems.reduce((a, c) => a + c.quantity * c.price, 0);
@@ -354,7 +365,8 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
                           className={
                             "link-table-card" +
                             (selectedTable?._id === option._id ? " link-table-card--selected" : "") +
-                            (option.tableStatus === TableStatus.OCCUPIED ? " link-table-card--occupied" : "")
+                            (option.tableStatus === TableStatus.OCCUPIED ? " link-table-card--occupied" : "") +
+                            (option.occupiedByMe ? " link-table-card--mine" : "")
                           }
                           onClick={() => selectTableRow(option)}
                         >
@@ -381,6 +393,14 @@ export default function LinkOrderSection(props: LinkOrderSectionProps) {
                                 color={tableStatusColor(option.tableStatus as TableStatus)}
                                 label={t(`tableStatus_${String(option.tableStatus)}` as never)}
                               />
+                              {option.occupiedByMe ? (
+                                <Chip
+                                  size="small"
+                                  className="link-table-card-yours"
+                                  color="info"
+                                  label={t("linkTableYours")}
+                                />
+                              ) : null}
                             </Stack>
                             {option.tableType ? (
                               <Typography variant="caption" className="link-table-card-type-line" component="span">
