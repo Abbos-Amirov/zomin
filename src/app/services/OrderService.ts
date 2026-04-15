@@ -1,5 +1,9 @@
 import axios from "axios";
-import { ORDERS_ALL_MEMBER_PATH, serverApi } from "../../lib/config";
+import {
+  ORDERS_ALL_MEMBER_PATH,
+  ORDERS_CANCEL_BY_MEMBER_PATH,
+  serverApi,
+} from "../../lib/config";
 import { CartItem } from "../../lib/types/search";
 import { OrderStatus } from "../../lib/enums/order.enum";
 import {
@@ -258,6 +262,31 @@ class OrderService {
       return result.data;
     } catch (err) {
       console.log("Error. updateOrder: ", err);
+      throw err;
+    }
+  }
+
+  /**
+   * Havola `/orders-link` bekor qilish — POST body `{ memberId, customerPhone }` (query: `orderId`).
+   */
+  public async cancelOrderByMember(
+    memberId: string,
+    orderId: string,
+    customerPhone: string
+  ): Promise<unknown> {
+    try {
+      const url = `${this.path}${ORDERS_CANCEL_BY_MEMBER_PATH}?orderId=${encodeURIComponent(
+        orderId
+      )}`;
+      const result = await axios.post(
+        url,
+        { memberId, customerPhone },
+        { withCredentials: true }
+      );
+      console.log("cancelOrderByMember:", result);
+      return result.data;
+    } catch (err) {
+      console.log("Error. cancelOrderByMember: ", err);
       throw err;
     }
   }

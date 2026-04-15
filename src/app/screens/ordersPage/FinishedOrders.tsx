@@ -32,7 +32,7 @@ interface FinishedOrdersProps {
 export default function FinishedOrders(props: FinishedOrdersProps) {
   const { linkFlow = false } = props;
   const { finishedOrders } = useSelector(finishedOrdersRetriever);
-  const { setOrderBulder } = useGlobals();
+  const { setOrderBulder, authMember } = useGlobals();
   const device = useDeviceDetect();
   const { t } = useLanguage();
 
@@ -63,13 +63,21 @@ export default function FinishedOrders(props: FinishedOrdersProps) {
   const cancelOrderHandler = async (e: T) => {
     try {
       const orderId = e.target.value;
-      const input: OrderUpdateInput = {
-        orderId,
-        orderStatus: OrderStatus.CANCELLED,
-      };
       if (!window.confirm(t("linkCancelOrderConfirm"))) return;
       const order = new OrderService();
-      await order.updateOrder(input);
+      if (linkFlow && authMember?._id) {
+        await order.cancelOrderByMember(
+          authMember._id,
+          orderId,
+          authMember.memberPhone ?? ""
+        );
+      } else {
+        const input: OrderUpdateInput = {
+          orderId,
+          orderStatus: OrderStatus.CANCELLED,
+        };
+        await order.updateOrder(input);
+      }
       setOrderBulder(new Date());
     } catch (err) {
       console.log(err);

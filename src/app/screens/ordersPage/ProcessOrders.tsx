@@ -94,7 +94,15 @@ export default function ProcessOrders(props: ProcessOrdersProps) {
       );
       if (confirmation) {
         const order = new OrderService();
-        await order.updateOrder(input);
+        if (linkFlow && authMember?._id) {
+          await order.cancelOrderByMember(
+            authMember._id,
+            orderId,
+            authMember.memberPhone ?? ""
+          );
+        } else {
+          await order.updateOrder(input);
+        }
         setOrderBulder(new Date());
       }
     } catch (err) {
