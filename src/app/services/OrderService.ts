@@ -290,6 +290,31 @@ class OrderService {
       throw err;
     }
   }
+
+  /**
+   * PATCH `/order/:orderId/item/:orderItemId/quantity` — body `{ quantity }`
+   */
+  public async updateOrderItemQuantity(
+    orderId: string,
+    orderItemId: string,
+    quantity: number
+  ): Promise<unknown> {
+    try {
+      const url = `${this.path}/order/${encodeURIComponent(
+        orderId
+      )}/item/${encodeURIComponent(orderItemId)}/quantity`;
+      const result = await axios.patch(
+        url,
+        { quantity },
+        { withCredentials: true }
+      );
+      console.log("updateOrderItemQuantity:", result);
+      return result.data;
+    } catch (err) {
+      console.log("Error. updateOrderItemQuantity: ", err);
+      throw err;
+    }
+  }
 }
 
 export default OrderService;

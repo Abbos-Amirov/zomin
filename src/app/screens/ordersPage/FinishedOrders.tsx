@@ -16,6 +16,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { useLanguage } from "../../context/LanguageContext";
+import LinkOrderItemLine from "../../components/orders/LinkOrderItemLine";
 
 /** REDUX SLICE & SELECTOR */
 
@@ -33,6 +34,7 @@ export default function FinishedOrders(props: FinishedOrdersProps) {
   const { linkFlow = false } = props;
   const { finishedOrders } = useSelector(finishedOrdersRetriever);
   const { setOrderBulder, authMember } = useGlobals();
+  const refreshOrders = () => setOrderBulder(new Date());
   const device = useDeviceDetect();
   const { t } = useLanguage();
 
@@ -78,7 +80,7 @@ export default function FinishedOrders(props: FinishedOrdersProps) {
         };
         await order.updateOrder(input);
       }
-      setOrderBulder(new Date());
+      refreshOrders();
     } catch (err) {
       console.log(err);
       sweetErrorHandling(err).then();
@@ -99,6 +101,18 @@ export default function FinishedOrders(props: FinishedOrdersProps) {
                       (ele: Product) => item.productId === ele._id
                     )[0];
                     if (!product) return null;
+                    if (linkFlow) {
+                      return (
+                        <LinkOrderItemLine
+                          key={item._id}
+                          order={order}
+                          item={item}
+                          product={product}
+                          mobile
+                          onUpdated={refreshOrders}
+                        />
+                      );
+                    }
                     const imagePath = `${serverApi}/${product.productImages[0]}`;
                     return (
                       <Box key={item._id} className="mobile-order-item">
@@ -191,16 +205,29 @@ export default function FinishedOrders(props: FinishedOrdersProps) {
                   const product: Product = order.productData.filter(
                     (ele: Product) => item.productId === ele._id
                   )[0];
+                  if (!product) return null;
+                  if (linkFlow) {
+                    return (
+                      <LinkOrderItemLine
+                        key={item._id}
+                        order={order}
+                        item={item}
+                        product={product}
+                        mobile={false}
+                        onUpdated={refreshOrders}
+                      />
+                    );
+                  }
                   const imagePath = `${serverApi}/${product.productImages[0]}`;
                   return (
                     <Box key={item._id} className="orders-name-price">
-                      <img src={imagePath} className="order-dish-img" />
+                      <img src={imagePath} className="order-dish-img" alt="" />
                       <p className="title-dish">{product.productName}</p>
                       <Box className="price-box">
                         <p>{CURRENCY_SYMBOL}{item.itemPrice}</p>
-                        <img src={"/icons/close.svg"} />
+                        <img src={"/icons/close.svg"} alt="" />
                         <p>{item.itemQuantity}</p>
-                        <img src="/icons/pause.svg" />
+                        <img src="/icons/pause.svg" alt="" />
                         <p>{CURRENCY_SYMBOL}{item.itemQuantity * item.itemPrice}</p>
                       </Box>
                     </Box>

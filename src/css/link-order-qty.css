@@ -1,0 +1,276 @@
+/* /orders-link — buyurtma qatorlari (+ / −) va kartochkalar */
+
+.orders-link-page {
+  --link-order-accent: #3776cc;
+  --link-order-accent-dark: #2d5fa3;
+  --link-order-surface: #ffffff;
+  --link-order-muted: #64748b;
+  --link-order-border: #e8eef5;
+  --link-order-radius: 16px;
+  --link-order-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+.orders-link-page .order-container {
+  flex-direction: column !important;
+  align-items: stretch;
+  gap: 20px;
+}
+
+.orders-link-page .order-main-box {
+  width: 100% !important;
+  max-width: 100%;
+  margin: 0 auto;
+  background: linear-gradient(145deg, #f8fafc 0%, #eef2f7 100%);
+  border-radius: var(--link-order-radius);
+  box-shadow: var(--link-order-shadow);
+  border: 1px solid var(--link-order-border);
+  overflow: hidden;
+}
+
+.orders-link-page .order-box-scroll {
+  margin: 0 !important;
+  border-radius: 0 0 var(--link-order-radius) var(--link-order-radius) !important;
+  background: var(--link-order-surface) !important;
+  box-shadow: none !important;
+  padding: 20px 22px 24px !important;
+  gap: 0 !important;
+}
+
+.orders-link-page .total-price-box {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 16px !important;
+  margin-top: 8px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--link-order-border);
+}
+
+.orders-link-page .box-total {
+  flex-wrap: wrap;
+  justify-content: center !important;
+  gap: 12px 20px !important;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e8f0fe 100%);
+  border-radius: 12px;
+  font-size: 15px !important;
+}
+
+.orders-link-page .box-total p {
+  margin: 0;
+}
+
+.orders-link-page .cancel-button {
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  padding: 10px 24px !important;
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.25);
+}
+
+/* Qator */
+.link-order-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--link-order-border);
+}
+
+.link-order-line:last-of-type {
+  border-bottom: none;
+}
+
+.link-order-line--loading {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.link-order-line__img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.link-order-line--mobile .link-order-line__img {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+}
+
+.link-order-line__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.link-order-line__name {
+  font-family: "Quicksand", system-ui, sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  color: #0f172a !important;
+  line-height: 1.35 !important;
+  margin-bottom: 6px !important;
+}
+
+.link-order-line__sub {
+  font-size: 0.875rem !important;
+}
+
+.link-order-line__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.link-order-line__unit {
+  font-size: 0.875rem !important;
+  color: var(--link-order-muted) !important;
+}
+
+.link-order-line--desktop {
+  justify-content: space-between;
+}
+
+.link-order-line--desktop .link-order-line__main {
+  flex: 1;
+}
+
+.link-order-line__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.link-order-line__line-total {
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  color: var(--link-order-accent) !important;
+  min-width: 4.5rem;
+  text-align: right;
+}
+
+.link-order-line__qty-readonly {
+  font-size: 0.9rem !important;
+  color: var(--link-order-muted) !important;
+}
+
+/* Pill +/− */
+.link-order-line__qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.link-order-line__qty--pill {
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 4px 6px;
+  border: 1px solid var(--link-order-border);
+}
+
+.link-order-line__pill-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: var(--link-order-surface);
+  color: var(--link-order-accent);
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: background 0.15s, transform 0.1s;
+}
+
+.link-order-line__pill-btn:hover:not(:disabled) {
+  background: #e8f0fe;
+  transform: scale(1.05);
+}
+
+.link-order-line__pill-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.link-order-line__qty-value {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.link-order-line__qty-spinner {
+  margin: 0 4px;
+}
+
+/* Mobile icon buttons */
+.link-order-line__qty-btn {
+  color: var(--link-order-accent) !important;
+  background: #f1f5f9 !important;
+  border: 1px solid var(--link-order-border) !important;
+}
+
+.link-order-line__qty-btn:hover {
+  background: #e8f0fe !important;
+}
+
+/* Mobile sahifa */
+.orders-link-page.mobile-orders-page {
+  background: linear-gradient(180deg, #f1f5f9 0%, #e8eef5 100%);
+}
+
+.orders-link-page .mobile-order-card {
+  border-radius: var(--link-order-radius);
+  box-shadow: var(--link-order-shadow);
+  border: 1px solid var(--link-order-border);
+  overflow: hidden;
+}
+
+.orders-link-page .mobile-order-processing {
+  border-left: 4px solid #f59e0b;
+}
+
+.orders-link-page .mobile-order-finished {
+  border-left: 4px solid #22c55e;
+}
+
+.orders-link-page .mobile-order-items {
+  padding: 18px 16px;
+  gap: 0;
+}
+
+.orders-link-page .mobile-order-summary {
+  padding: 16px 18px;
+  background: #f8fafc;
+  border-top: 1px solid var(--link-order-border);
+}
+
+.orders-link-page .mobile-order-summary-total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--link-order-accent);
+}
+
+.orders-link-page .mobile-order-actions .MuiButton-root {
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+}
+
+.link-order-line--mobile .link-order-line__meta {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.link-order-line--mobile .link-order-line__line-total {
+  margin-left: auto;
+}

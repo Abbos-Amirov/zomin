@@ -24,6 +24,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { useLanguage } from "../../context/LanguageContext";
+import LinkOrderItemLine from "../../components/orders/LinkOrderItemLine";
 
 /** A'zo (havola oqimi): PAUSE buyurtmalar bitta ro'yxatda */
 function mergeInProgressOrders(
@@ -241,6 +242,18 @@ export default function ProcessOrders(props: ProcessOrdersProps) {
                       (ele: Product) => item.productId === ele._id
                     )[0];
                     if (!product) return null;
+                    if (linkFlow) {
+                      return (
+                        <LinkOrderItemLine
+                          key={item._id}
+                          order={order}
+                          item={item}
+                          product={product}
+                          mobile
+                          onUpdated={() => setOrderBulder(new Date())}
+                        />
+                      );
+                    }
                     const imagePath = `${serverApi}/${product.productImages[0]}`;
                     return (
                       <Box key={item._id} className="mobile-order-item">
@@ -308,6 +321,19 @@ export default function ProcessOrders(props: ProcessOrdersProps) {
                 const product: Product = order.productData.filter(
                   (ele: Product) => item.productId === ele._id
                 )[0];
+                if (!product) return null;
+                if (linkFlow) {
+                  return (
+                    <LinkOrderItemLine
+                      key={item._id}
+                      order={order}
+                      item={item}
+                      product={product}
+                      mobile={false}
+                      onUpdated={() => setOrderBulder(new Date())}
+                    />
+                  );
+                }
                 const imagePath = `${serverApi}/${product.productImages[0]}`;
                 return (
                   <Box key={item._id} className="orders-name-price">

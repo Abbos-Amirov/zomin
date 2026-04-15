@@ -15,6 +15,7 @@ import { useDispatch } from "react-redux";
 import OrderService from "../../services/OrderService";
 import { useGlobals } from "../../hooks/useGlobals";
 import "../../../css/order.css";
+import "../../../css/link-order-qty.css";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import "../../../css/mobile/order.css";
 import { isLinkFlowCustomer } from "../../../lib/menuProductsPath";
@@ -73,7 +74,7 @@ export default function OrdersLinkPage(props: OrdersLinkPageProps) {
 
   if (device === "mobile") {
     return (
-      <div className="mobile-orders-page">
+      <div className="mobile-orders-page orders-link-page">
         <Box className="mobile-orders-container">
           <ProcessOrders
             callHandler={callHandler}
@@ -87,7 +88,7 @@ export default function OrdersLinkPage(props: OrdersLinkPageProps) {
   }
 
   return (
-    <div className="order-page">
+    <div className="order-page orders-link-page">
       <Box className="order-container" sx={{ maxWidth: 960, mx: "auto", px: 2 }}>
         <ProcessOrders
           callHandler={callHandler}
