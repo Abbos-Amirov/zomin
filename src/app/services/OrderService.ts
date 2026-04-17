@@ -173,20 +173,19 @@ class OrderService {
     options?: { memberId?: string; tableId?: string }
   ): Promise<Order> {
     try {
-      const orderItems: OrderItemInput[] = input.map((cartItem: CartItem) => {
-        return {
-          itemQuantity: cartItem.quantity,
-          itemPrice: cartItem.price,
-          productId: cartItem._id,
-        };
-      });
+      const cartMapped: OrderItemInput[] = input.map((cartItem: CartItem) => ({
+        productId: cartItem._id,
+        itemQuantity: cartItem.quantity,
+        itemPrice: cartItem.price,
+      }));
 
-      const body: Record<string, unknown> = { orderItems };
-      if (options?.memberId) body.memberId = options.memberId;
-      if (options?.tableId) body.tableId = options.tableId;
+      const params = new URLSearchParams();
+      if (options?.memberId) params.append("memberId", options.memberId);
+      if (options?.tableId) params.append("tableId", options.tableId);
+      const qs = params.toString();
+      const url = `${this.path}/order/create${qs ? `?${qs}` : ""}`;
 
-      const url = this.path + "/order/create";
-      const result = await axios.post(url, body, {
+      const result = await axios.post(url, cartMapped, {
         withCredentials: true,
       });
       console.log("createOrder:", result);
