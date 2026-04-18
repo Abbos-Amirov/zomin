@@ -6,7 +6,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
 import { Order, OrderItem, OrderUpdateInput } from "../../../lib/types/order";
 import { Product } from "../../../lib/types/product";
-import { serverApi, CURRENCY_SYMBOL } from "../../../lib/config";
+import { CURRENCY_SYMBOL } from "../../../lib/config";
 import { sweetErrorHandling } from "../../../lib/sweetAlert";
 import { OrderStatus, PaymentStatus } from "../../../lib/enums/order.enum";
 import { useGlobals } from "../../hooks/useGlobals";
@@ -17,6 +17,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { useLanguage } from "../../context/LanguageContext";
+import LinkOrderItemLine from "../../components/orders/LinkOrderItemLine";
+import "../../../css/link-order-qty.css";
 
 /** REDUX SLICE & SELECTOR */
 
@@ -27,6 +29,7 @@ const pausedOrdersRetriever = createSelector(
 
 export default function PausedOrders() {
   const { setOrderBulder, authMember, authTable } = useGlobals();
+  const refreshOrders = () => setOrderBulder(new Date());
   const { pausedOrders } = useSelector(pausedOrdersRetriever);
   const device = useDeviceDetect();
   const { t } = useLanguage();
@@ -44,7 +47,7 @@ export default function PausedOrders() {
       if (confirmation) {
         const order = new OrderService();
         await order.updateOrder(input);
-        setOrderBulder(new Date());
+        refreshOrders();
       }
     } catch (err) {
       console.log(err);
@@ -69,7 +72,7 @@ export default function PausedOrders() {
       if (confirmation) {
         const order = new OrderService();
         await order.updateOrder(input);
-        setOrderBulder(new Date());
+        refreshOrders();
       }
     } catch (err) {
       console.log(err);
@@ -94,27 +97,15 @@ export default function PausedOrders() {
                       (ele: Product) => item.productId === ele._id
                     )[0];
                     if (!product) return null;
-                    const imagePath = `${serverApi}/${product.productImages[0]}`;
                     return (
-                      <Box key={item._id} className="mobile-order-item">
-                        <img src={imagePath} className="mobile-order-item-img" alt={product.productName} />
-                        <Box className="mobile-order-item-info">
-                          <Typography className="mobile-order-item-name">
-                            {product.productName}
-                          </Typography>
-                          <Box className="mobile-order-item-price-row">
-                            <Typography className="mobile-order-item-price">
-                              {CURRENCY_SYMBOL}{item.itemPrice}
-                            </Typography>
-                            <Typography className="mobile-order-item-quantity">
-                              x {item.itemQuantity}
-                            </Typography>
-                            <Typography className="mobile-order-item-total">
-                              {CURRENCY_SYMBOL}{(item.itemQuantity * item.itemPrice).toFixed(2)}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Box>
+                      <LinkOrderItemLine
+                        key={item._id}
+                        order={order}
+                        item={item}
+                        product={product}
+                        mobile
+                        onUpdated={refreshOrders}
+                      />
                     );
                   })}
                 </Box>
@@ -184,21 +175,15 @@ export default function PausedOrders() {
                     (ele: Product) => item.productId === ele._id
                   )[0];
                   if (!product) return null;
-                  const imagePath = product.productImages?.[0]
-                    ? `${serverApi}/${product.productImages[0]}`
-                    : "/icons/noimage-list.svg";
                   return (
-                    <Box key={item._id} className="orders-name-price">
-                      <img src={imagePath} className="order-dish-img" />
-                      <p className="title-dish">{product.productName}</p>
-                      <Box className="price-box">
-                        <p>{CURRENCY_SYMBOL}{item.itemPrice}</p>
-                        <img src={"/icons/close.svg"} />
-                        <p>{item.itemQuantity}</p>
-                        <img src="/icons/pause.svg" />
-                        <p>{CURRENCY_SYMBOL}{item.itemQuantity * item.itemPrice}</p>
-                      </Box>
-                    </Box>
+                    <LinkOrderItemLine
+                      key={item._id}
+                      order={order}
+                      item={item}
+                      product={product}
+                      mobile={false}
+                      onUpdated={refreshOrders}
+                    />
                   );
                 })}
                 <Box className="total-price-box">
