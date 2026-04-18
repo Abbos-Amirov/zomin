@@ -22,7 +22,7 @@ export const ORDERS_ALL_MEMBER_PATH =
   "/orders/all-member";
 
 /**
- * POST `{serverApi}/orders/cancel-by-member?orderId=...` — body `{ memberId, customerPhone }`.
+ * POST `{serverApi}/orders/cancel-by-member?orderId=...` — body `{ memberId, customerPhone, orderId }`.
  */
 export const ORDERS_CANCEL_BY_MEMBER_PATH =
   (process.env.REACT_APP_ORDERS_CANCEL_BY_MEMBER_PATH &&

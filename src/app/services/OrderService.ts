@@ -270,7 +270,7 @@ class OrderService {
   }
 
   /**
-   * Havola `/orders-link` bekor qilish — POST body `{ memberId, customerPhone }` (query: `orderId`).
+   * Havola `/orders-link` bekor qilish — POST body `{ memberId, customerPhone, orderId }`.
    */
   public async cancelOrderByMember(
     memberId: string,
@@ -283,7 +283,7 @@ class OrderService {
       )}`;
       const result = await axios.post(
         url,
-        { memberId, customerPhone },
+        { memberId, customerPhone, orderId },
         { withCredentials: true }
       );
       console.log("cancelOrderByMember:", result);
